@@ -41,7 +41,7 @@ class Preamble_Detection_py_bb(gr.basic_block):
 
         self.received_length = 0  # Keeps track of number of bytes received for current packet.
         self.packet_length = 0  # Number of bytes expected from packet
-        self.preamblequeue = bytearray(1) # We will use a (32 bit) integer to check for the prefix.
+        self.preamblequeue = 0 # We will use a (32 bit) integer to check for the prefix.
         self.bitqueue = bytearray(1)
         self.bitcounter = 7
         self.headerqueue = [] # Create an empty list to hold bits of header.
@@ -50,7 +50,8 @@ class Preamble_Detection_py_bb(gr.basic_block):
                             name="Preamble_Detection_py_bb",
                             in_sig=[numpy.byte],
                             out_sig=[numpy.byte])
-        print("Getting startd. Preamble is set to: "+str(self.preamble))
+        print("Getting started. Preamble is set to: "+str(self.preamble))
+        print("Version 3.11.18:14.27")
 
 
     def forecast(self, noutput_items, ninput_items_required):
@@ -68,34 +69,23 @@ class Preamble_Detection_py_bb(gr.basic_block):
 
 
     def general_work(self, input_items, output_items):
-        #print("General Work Called! State: "+str(self.state))
-        #print("Length of input items 0: " + str(len(input_items[0])))
-        #print("Lenth of output items 0: " + str(len(output_items[0])))
-
-        #if len(input_items[0]) < 15:
-         #   print("Input items 0: " + str(input_items[0]))
-            #print("Lenth of output items 0: " + str(len(output_items[0])))
-        #    raise NameError("\n\n\nToo many inputs for this test\n\n")
-        # Hard value set by size of input/output items, determined by scheduler
-        # Number of outputs is typically less than number of inputs.
-        # This allows us to work on the maximum outputable number of inputs.
 
         # Search for the start of the packet. This will aline the bits.
         if self.state == self.SEARCH:
-            #print("Searching for Preamble.")
+            # print("Searching for Preamble.")
             # Search for the preamble. Consume everything before preamble.
             # If preamble is found. Consume everything prior.
             # Only raise a flag, do not output anything yet.
-            # Next call on real data will output correctly.
+            # Next step we will call general work again to sort the header.
             count = 1
             for i in range(len(input_items[0])):
-                self.preamblequeue[0] = (self.preamblequeue[0] << 1) & 0xFF
-                self.preamblequeue[0] = self.preamblequeue[0] | (0x01 & input_items[0][i])
-                if (self.preamblequeue[0] == self.preamble):
+                self.preamblequeue = (self.preamblequeue << 1) & 0xFFFFFFFF # shift then mask to ensure that we stay at 32 bits
+                self.preamblequeue = self.preamblequeue | (0x01 & input_items[0][i]) # Set the LSB of input to LSB of queue
+                if (self.preamblequeue == self.preamble):
                     if self.DebugPrints:
-                        print("Searching: Found preamble: " + str(self.preamblequeue[0]))
+                        print("Searching: Found preamble: " + str(self.preamblequeue))
                     self.headerqueue = [] # Reset the headerqueue before we change state
-                    self.preamblequeue = bytearray(1) # Reset the preamble queue for the next packet.
+                    self.preamblequeue = 0 # Reset the preamble queue for the next packet.
                     self.state = self.HEADER # Enter the header state
                     break
                 count += 1
