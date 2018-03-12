@@ -9,7 +9,7 @@ import numpy as np
 class packetize():
     SUPPORTEDTYPES = [bytearray, str, list]
 
-    def __init__(self, port=200, preamble='5'):
+    def __init__(self, port=200, preamble=5):
         print("Setting up class")
         # self.port = port
         self.preamble = preamble
@@ -44,9 +44,9 @@ class packetize():
 
         ### Creat synchronization data ###
         syncdata = bytearray(list("SectionUsedForModulationSynchronization"))
-        for i in range (4):
-			prefixbit = (prefix >> (3-i)*8) & 0xFF
-			syncdata.append(prefixbit)
+        for i in range(4):
+            preamblebit = (self.preamble >> (3 - i) * 8) & 0xFF
+            syncdata.append(preamblebit)
 
         ## Send ms over UDP to GRC ### NOW JUST RETURN DATA
         message = syncdata + header + data
