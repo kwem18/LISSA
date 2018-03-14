@@ -132,7 +132,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>10000e3</value>
+      <value>100e3</value>
     </param>
   </block>
   <block>
@@ -623,7 +623,7 @@
     </param>
     <param>
       <key>repeat</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>vlen</key>

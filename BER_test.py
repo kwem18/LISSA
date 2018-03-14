@@ -82,6 +82,7 @@ while(lever==1):
 		if (not alpha) or len(alpha)==0:
 			print "length of payload < field length value, escaping definition."
 			lever = 0
+			break
 		length += ord(alpha)*1000
 		alpha = outputf.read(1)
 		if (not alpha) or len(alpha)==0:
@@ -119,7 +120,7 @@ for found in glob.glob("OUTPUT/pkt*"):	#Create list for output packets
 for piece in glob.glob("pkt*"):			#create list for input packets
 	inpt_list.append(piece)
 
-droppedpkt = len(inpt_pkt) - len(otpt_pkt) #use length of list to determine # of pkts dropped
+droppedpkt = len(inpt_list) - len(otpt_list) #use length of list to determine # of pkts dropped
 print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
 	
 ###Now we have a list of packets, lets compare!
