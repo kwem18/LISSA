@@ -132,7 +132,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1000e3</value>
+      <value>10000e3</value>
     </param>
   </block>
   <block>
@@ -187,6 +187,33 @@
     <param>
       <key>value</key>
       <value>13e3</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(752, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>channel_bw</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>25e3</value>
     </param>
   </block>
   <block>
@@ -317,7 +344,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -341,14 +368,14 @@
     </param>
     <param>
       <key>Preamble</key>
-      <value>5</value>
+      <value>26530</value>
     </param>
   </block>
   <block>
     <key>analog_noise_source_x</key>
     <param>
       <key>amp</key>
-      <value>.10</value>
+      <value>0</value>
     </param>
     <param>
       <key>alias</key>
@@ -466,7 +493,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -521,7 +548,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>Output_File</value>
+      <value>/home/odroid/GitRepos/LISSA_branches/SDR/LISSA/GRC_output.bin</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -568,7 +595,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>Input_File</value>
+      <value>/home/odroid/GitRepos/LISSA_branches/SDR/LISSA/TX_INPUT.bin</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -596,7 +623,7 @@
     </param>
     <param>
       <key>repeat</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>vlen</key>
@@ -615,7 +642,7 @@
     </param>
     <param>
       <key>const</key>
-      <value>.6</value>
+      <value>.4</value>
     </param>
     <param>
       <key>affinity</key>
@@ -725,7 +752,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -805,6 +832,57 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_costas_loop_cc</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(648, 288)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>digital_costas_loop_cc_0</value>
+    </param>
+    <param>
+      <key>w</key>
+      <value>channel_bw</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>order</key>
+      <value>const_points</value>
+    </param>
+    <param>
+      <key>use_snr</key>
+      <value>False</value>
     </param>
   </block>
   <block>
@@ -3605,7 +3683,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -4115,6 +4193,12 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>digital_costas_loop_cc_0</source_block_id>
+    <sink_block_id>digital_psk_demod_0_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>digital_psk_demod_0_0_0</source_block_id>
     <sink_block_id>Senior_Design_Preamble_Detection_py_bb_0</sink_block_id>
     <source_key>0</source_key>
@@ -4152,7 +4236,7 @@
   </connection>
   <connection>
     <source_block_id>rational_resampler_xxx_0_0</source_block_id>
-    <sink_block_id>digital_psk_demod_0_0_0</sink_block_id>
+    <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
