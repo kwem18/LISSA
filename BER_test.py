@@ -9,7 +9,7 @@ import glob
 #--------------------------------------------------------------------------
 def BERTEST(filename_in):
 	file = str(filename_in)				#INPUT FILENME MUST BE PUT IN HERE
-	filecheck = "OUTPUT/"+
+	filecheck = "OUTPUT/"+ file
 	fpath0 = Path(file)
 	fpath = Path(filecheck)
 	print "Checking packet:",file
@@ -21,7 +21,7 @@ def BERTEST(filename_in):
 		return
 		
 	f = open(file,'rb')					#open test file
-	h = open("OUTPUT/"+file1,'rb')		#ACCESS FILE in OUTPUT FOLDER
+	h = open(filecheck,'rb')		#ACCESS FILE in OUTPUT FOLDER
 	print "Packet Target:",file
 	switch = 1
 	counter = 7
@@ -124,7 +124,7 @@ print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
 	
 ###Now we have a list of packets, lets compare!
 droppedpkt = 0
-for target in range(len(otpt_list)):
+for target in range(len(inpt_list)):
 	BERTEST(target)  #BERTEST def should either return 1 or 0
 	
 
