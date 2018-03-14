@@ -30,22 +30,22 @@ def BERTEST(filename_in):
 	bit_error_count = 0
 	while(switch==1):
 		counter = 7
-		byte = f.read(1)
-		byte1 = h.read(1)
-		if byte:
-			byte_list = []
-			byte_list1 = []
+		alpha = f.read(1)
+		alpha1 = h.read(1)
+		if alpha:
+			alpha_list = []
+			alpha_list1 = []
 			while (counter>=0):
-				number = ord(byte)
-				number1 = ord(byte1)
+				number = ord(alpha)
+				number1 = ord(alpha1)
 				bit = (number>>counter) & (0x01)  #create bit for list index
 				bit1 = (number1>>counter) & (0x01)
-				byte_list.append(bit)             #add bit to list
-				byte_list1.append(bit1)
+				alpha_list.append(bit)             #add bit to list
+				alpha_list1.append(bit1)
 				counter -= 1
         
-			input_list.append(byte_list)
-			output_list.append(byte_list1)
+			input_list.append(alpha_list)
+			output_list.append(alpha_list1)
 		else:
 			switch = 0
 	f.close()
@@ -57,10 +57,10 @@ def BERTEST(filename_in):
 				continue
 			else:
 				bit_error_count += 1
-				print "Bit error at byte",x
+				print "Bit error at alpha",x
 				print "at bit number", y
-				print "INPUT BYTE:",input_list[x]
-				print "OUTPUT BYTE:",output_list[x]
+				print "INPUT alpha:",input_list[x]
+				print "OUTPUT alpha:",output_list[x]
 				print "\n------------------------------------------------"
 	print "Total number of bits lost:",bit_error_count
 	print "END PACKET:",file
@@ -78,26 +78,26 @@ while(lever==1):
 	length = 0
 	name = outputf.read(7)					#read pkt name save it
 	if name:
-		byte = outputf.read(1)				#read length based on int value of each byte
-		if not byte:
+		alpha = outputf.read(1)			#read length based on int value of each alpha
+		if (not alpha) or len(alpha)==0:
 			print "length of payload < field length value, escaping definition."
 			lever = 0
-		length += ord(byte)*1000
-		byte = outputf.read(1)
-		if not byte:
+		length += ord(alpha)*1000
+		alpha = outputf.read(1)
+		if (not alpha) or len(alpha)==0:
 			print "length of payload < field length value, escaping definition."
 			lever = 0
-		length += ord(byte)*100
-		byte = outputf.read(1)
-		if not byte:
+		length += ord(alpha)*100
+		alpha = outputf.read(1)
+		if (not alpha) or len(alpha)==0:
 			print "length of payload < field length value, escaping definition."
 			lever = 0
-		length += ord(byte)*10
-		byte = outputf.read(1)
-		if not byte:
+		length += ord(alpha)*10
+		alpha = outputf.read(1)
+		if (not alpha) or len(alpha)==0:
 			print "length of payload < field length value, escaping definition."
 			lever = 0
-		length += ord(byte)					#length calculated
+		length += ord(alpha)					#length calculated
 		
 		msg = outputf.read(length)			#get pyld
 		r = open("OUTPUT/"+name,'wb')		#make new file at OUTPUT folder using name
