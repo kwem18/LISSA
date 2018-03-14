@@ -1,4 +1,5 @@
 #BER TEST Erick Terrazas G00776650
+#Last edit made on 3/13/18
 from pathlib import Path
 import os
 import sys
@@ -8,11 +9,17 @@ import glob
 #--------------------------------------------------------------------------
 def BERTEST(filename_in):
 	file = str(filename_in)				#INPUT FILENME MUST BE PUT IN HERE
-	filecheck = "OUTPUT/"+file
+	filecheck = "OUTPUT/"+
+	fpath0 = Path(file)
+	fpath = Path(filecheck)
 	print "Checking packet:",file
-	if filecheck.is_file():
+	if (fpath0.is_file() & fpath.is_file()):
+		print "PACKET exists"
+		
+	else:
 		print "PACKET DROPPED"
-		return 1
+		return
+		
 	f = open(file,'rb')					#open test file
 	h = open("OUTPUT/"+file1,'rb')		#ACCESS FILE in OUTPUT FOLDER
 	print "Packet Target:",file
@@ -57,7 +64,7 @@ def BERTEST(filename_in):
 				print "\n------------------------------------------------"
 	print "Total number of bits lost:",bit_error_count
 	print "END PACKET:",file
-	return 0			
+	return 			
 	
 	
 #MAIN FUNCTION----------------------------------------------------------
@@ -72,12 +79,24 @@ while(lever==1):
 	name = outputf.read(7)					#read pkt name save it
 	if name:
 		byte = outputf.read(1)				#read length based on int value of each byte
+		if not byte:
+			print "length of payload < field length value, escaping definition."
+			return
 		length += ord(byte)*1000
 		byte = outputf.read(1)
+		if not byte:
+			print "length of payload < field length value, escaping definition."
+			return
 		length += ord(byte)*100
 		byte = outputf.read(1)
+		if not byte:
+			print "length of payload < field length value, escaping definition."
+			return
 		length += ord(byte)*10
 		byte = outputf.read(1)
+		if not byte:
+			print "length of payload < field length value, escaping definition."
+			return
 		length += ord(byte)					#length calculated
 		
 		msg = outputf.read(length)			#get pyld
@@ -90,18 +109,25 @@ while(lever==1):
 
 ###NOW we have an input segment in main dir., and its corresponding input in OUTPUT folder
 #-We have to make a list of both file groups to calculate files dropped\n------------------------------------
-otpt_list =[]
-
-for found in glob.glob("OUTPUT/pkt*"):
-	found = found.split('/')[1]			#isolate pktxxxx
+otpt_list = []
+inpt_list = []
+print "Calculating packets dropped...\n-----------------\n-----------------\n-----------------"
+for found in glob.glob("OUTPUT/pkt*"):	#Create list for output packets
+	found = found.split('/')[1]			#Isolate pktXXXX
 	otpt_list.append(found)				#add name to array
+	
+for piece in glob.glob("pkt*"):			#create list for input packets
+	inpt_list.append(piece)
+
+droppedpkt = len(inpt_pkt) - len(otpt_pkt) #use length of list to determine # of pkts dropped
+print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
 	
 ###Now we have a list of packets, lets compare!
 droppedpkt = 0
 for target in range(len(otpt_list)):
-	droppedpkt += BERTEST(target)  #BERTEST def should either return 1 or 0
+	BERTEST(target)  #BERTEST def should either return 1 or 0
 	
-print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
+
 print"END TEST\n-----------------------------------------------------"
 	
 	
