@@ -67,7 +67,7 @@ def BERTEST(filename_in):
 	return 			
 	
 	
-#MAIN FUNCTION----------------------------------------------------------
+#MAIN FUNCTION--------------------------------------------------------------------------------------------------------------------------
 
 ###PACKETS DROPPED CHECK START
 print "Testing output packets\n-----------------\n-----------------\n-----------------"
@@ -81,22 +81,22 @@ while(lever==1):
 		byte = outputf.read(1)				#read length based on int value of each byte
 		if not byte:
 			print "length of payload < field length value, escaping definition."
-			return
+			lever = 0
 		length += ord(byte)*1000
 		byte = outputf.read(1)
 		if not byte:
 			print "length of payload < field length value, escaping definition."
-			return
+			lever = 0
 		length += ord(byte)*100
 		byte = outputf.read(1)
 		if not byte:
 			print "length of payload < field length value, escaping definition."
-			return
+			lever = 0
 		length += ord(byte)*10
 		byte = outputf.read(1)
 		if not byte:
 			print "length of payload < field length value, escaping definition."
-			return
+			lever = 0
 		length += ord(byte)					#length calculated
 		
 		msg = outputf.read(length)			#get pyld
