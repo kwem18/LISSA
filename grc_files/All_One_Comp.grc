@@ -340,7 +340,7 @@
     </param>
     <param>
       <key>Debug</key>
-      <value>True</value>
+      <value>5</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -368,7 +368,7 @@
     </param>
     <param>
       <key>Preamble</key>
-      <value>26530</value>
+      <value>5</value>
     </param>
   </block>
   <block>
@@ -548,7 +548,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/odroid/GitRepos/LISSA_branches/SDR/LISSA/GRC_output.bin</value>
+      <value>/home/william/Desktop/Output</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -591,7 +591,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>file</key>
@@ -599,7 +599,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(64, 196)</value>
+      <value>(8, 236)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -752,7 +752,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
