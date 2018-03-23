@@ -228,33 +228,6 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(784, 548)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>nfilts</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>32</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
       <value>(280, 12)</value>
     </param>
     <param>
@@ -340,7 +313,7 @@
     </param>
     <param>
       <key>Debug</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -348,7 +321,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(216, 260)</value>
+      <value>(224, 268)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -387,11 +360,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(168, 396)</value>
+      <value>(200, 452)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -442,7 +415,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/odroid/GitRepos/LISSA_branches/SDR/LISSA/GRC_output.bin</value>
+      <value>/home/william/Desktop/Output</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -489,7 +462,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(984, 472)</value>
+      <value>(984, 496)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -540,7 +513,7 @@
     </param>
     <param>
       <key>w</key>
-      <value>channel_bw</value>
+      <value>0.99</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1934,7 +1907,7 @@
     </param>
     <param>
       <key>args</key>
-      <value>soapy=0,driver=lime,serial=0009061C02CF232D</value>
+      <value>soapy=0,driver=lime</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -2073,7 +2046,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>fftsize</key>
@@ -2275,11 +2248,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(344, 380)</value>
+      <value>(376, 436)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2634,7 +2607,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(784, 444)</value>
+      <value>(776, 468)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2667,6 +2640,12 @@
   </block>
   <connection>
     <source_block_id>Senior_Design_Preamble_Detection_py_bb_0</source_block_id>
+    <sink_block_id>blocks_char_to_float_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>Senior_Design_Preamble_Detection_py_bb_0</source_block_id>
     <sink_block_id>blocks_file_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -2690,14 +2669,14 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>digital_psk_demod_0_0_0</source_block_id>
-    <sink_block_id>Senior_Design_Preamble_Detection_py_bb_0</sink_block_id>
+    <source_block_id>digital_costas_loop_cc_0</source_block_id>
+    <sink_block_id>qtgui_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>digital_psk_demod_0_0_0</source_block_id>
-    <sink_block_id>blocks_char_to_float_0</sink_block_id>
+    <sink_block_id>Senior_Design_Preamble_Detection_py_bb_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2716,12 +2695,6 @@
   <connection>
     <source_block_id>rational_resampler_xxx_0</source_block_id>
     <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>rational_resampler_xxx_0</source_block_id>
-    <sink_block_id>qtgui_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
