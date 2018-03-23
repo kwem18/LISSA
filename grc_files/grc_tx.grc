@@ -132,7 +132,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>10e6</value>
+      <value>1e6</value>
     </param>
   </block>
   <block>
@@ -213,7 +213,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>4</value>
+      <value>2</value>
     </param>
   </block>
   <block>
@@ -298,7 +298,7 @@
     </param>
   </block>
   <block>
-    <key>analog_random_source_x</key>
+    <key>blocks_file_source</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -316,8 +316,12 @@
       <value>True</value>
     </param>
     <param>
+      <key>file</key>
+      <value>/home/odroid/GitRepos/LISSA_branches/SDR/LISSA/TX_INPUT.bin</value>
+    </param>
+    <param>
       <key>_coordinate</key>
-      <value>(40, 260)</value>
+      <value>(40, 324)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -325,27 +329,15 @@
     </param>
     <param>
       <key>id</key>
-      <value>analog_random_source_x_0</value>
+      <value>blocks_file_source_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
       <value>0</value>
     </param>
     <param>
-      <key>max</key>
-      <value>256</value>
-    </param>
-    <param>
       <key>minoutbuf</key>
       <value>0</value>
-    </param>
-    <param>
-      <key>min</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>num_samps</key>
-      <value>1000</value>
     </param>
     <param>
       <key>type</key>
@@ -354,6 +346,10 @@
     <param>
       <key>repeat</key>
       <value>True</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
     </param>
   </block>
   <block>
@@ -401,69 +397,6 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_udp_source</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(24, 372)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_udp_source_0</value>
-    </param>
-    <param>
-      <key>ipaddr</key>
-      <value>127.0.0.1</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>eof</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>psize</key>
-      <value>1472</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>40431</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1457,7 +1390,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(960, 460)</value>
+      <value>(1008, 340)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1588,7 +1521,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(968, 172)</value>
+      <value>(1008, 220)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1925,7 +1858,7 @@
     </param>
   </block>
   <connection>
-    <source_block_id>analog_random_source_x_0</source_block_id>
+    <source_block_id>blocks_file_source_0</source_block_id>
     <sink_block_id>digital_psk_mod_0_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -1939,12 +1872,6 @@
   <connection>
     <source_block_id>blocks_multiply_const_vxx_0_0_0</source_block_id>
     <sink_block_id>qtgui_sink_x_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_udp_source_0</source_block_id>
-    <sink_block_id>digital_psk_mod_0_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
