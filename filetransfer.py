@@ -24,10 +24,10 @@ import numpy as np
 ##Take  test jpeg file in directory and split it using fileManip definitions
 intial = time.clock()
 
-orig_file = 'small_pkt.txt' #grab file name from cmd input
+orig_file = 'sat_pic.JPG' #grab file name from cmd input
 prefix = 'pkt'			#Using string 'pic' for header later
 preamble = 26530			#preamble for 'skipheader' gnuradio block
-fsize = 10			#Size of segments we want for split def (in bytes)
+fsize = 1000			#Size of segments we want for split def (in bytes)
 
 fileManip.cut(orig_file,prefix,fsize) #splits files and stores them to directory this python file is in
 
