@@ -19,7 +19,7 @@
   <param>
     <name>Debug</name>
     <key>Debug</key>
-    <type>bool</type>
+    <type>int</type>
   </param>
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)
