@@ -20,7 +20,7 @@ def BERTEST(filename_in):
 	global total_bit_loss
 	file = str(filename_in)				#INPUT FILENAME MUST BE PUT IN HERE
 	filecheck0= "INPUT/" + file			#Path of input pkt at INPUT folder of directory
-	filecheck1 = "OUTPUT/"+ file		#Path of POSSIBLE received packet at OUTPUT folder of directory
+	filecheck1 = "Outputs/"+ file		#Path of POSSIBLE received packet at OUTPUT folder of directory
 	print "BERTEST for packet:",file	#State the name of pkt we are hecking for inconsistencies with test pkt
 	fpath0 = Path(filecheck0)					#designates the path of input filename with respect to main directory
 	fpath = Path(filecheck1)				#designates the path of output filename with respect to main directory
@@ -37,7 +37,7 @@ def BERTEST(filename_in):
 		print "-----------------------------------------------------------------------------#\n"
 		return
 		
-	f = open(filecheck0,'rb')					#ACESS TEST FILE in INPTU FOLDER
+	f = open(filecheck0,'rb')					#ACESS TEST FILE in INPUT FOLDER
 	h = open(filecheck1,'rb')					#ACCESS FILE in OUTPUT FOLDER
 	switch = 1
 	counter = 7
@@ -46,27 +46,33 @@ def BERTEST(filename_in):
 	bit_error_count = 0				#define bit error count for packet
 	while(switch==1):				#while loop used in order to read a byte for input & output and place them into their respective lists
 		counter = 7
-		beta = f.read(1)			#beta holds byte read from input pkt
-		beta1 = h.read(1)			#beta1 holds byte read from output pkt
+		beta = f.read(1)			#beta holds byte read from input pkt  	<---------------------------
+		beta1 = h.read(1)			#beta1 holds byte read from output pkt	<---------------------------
+		
 		if beta:
-			byte_list = []			#this smaller list will hold a byte of input pkt payload
-			byte_list1 = []			#holds byte of output pkt payload
-			while (counter>=0):
-				number = ord(beta)				#number will have number representation of byte using ord() function
-				number1 = ord(beta1)
-				bit = (number>>counter) & (0x01)  #create bit for list index
-				bit1 = (number1>>counter) & (0x01)
-				byte_list.append(bit)             #add bit to input byte list
-				byte_list1.append(bit1)			  #add bit to output byte list
-				counter -= 1
+			if beta1:
+				byte_list = []			#this smaller list will hold a byte of input pkt payload
+				byte_list1 = []			#holds byte of output pkt payload
+				while (counter>=0):
+					number = ord(beta)				#number will have number representation of byte using ord() function
+					number1 = ord(beta1)
+					bit = (number>>counter) & (0x01)  #create bit for list index
+					bit1 = (number1>>counter) & (0x01)
+					byte_list.append(bit)             #add bit to input byte list
+					byte_list1.append(bit1)			  #add bit to output byte list
+					counter -= 1
+			
+			else:
+				print "OUTPACKET LENGTH IS LESS THAN INPUT! DROPPING PACKET",file
+				return
         
 			input_list.append(byte_list)		#append byte_list into input_list ex (byte_list = [ [0,0,0,1,0,1,0,0] , [0,0,0,0,0,0,0,0] , ... ])
 			output_list.append(byte_list1)
 		else:
 			switch = 0
-			break
-	f.close()
-	h.close()
+			break			#Leave while loop data is fully read
+	f.close()								#CLOSE INPUT TEST FILE
+	h.close()								#CLOSE OUTPUT FILE
 	bit_error_count = 0							 #counter for number of bit inconsistencies
 	for x in range(len(input_list)):					#for loop uses x at byte value, and y as bit number 
 		for y in range(len(input_list[0])):
@@ -146,7 +152,7 @@ def BERTEST(filename_in):
 otpt_list = []		#This list will have the filenames of packets we outputted from Rx grc
 inpt_list = []		#This list will have the filenames of packets we inputted into Tx grc
 print "Calculating packets dropped...\n-----------------\n-----------------"
-for found in glob.glob("OUTPUT/pkt*"):	#Create list for output packets
+for found in glob.glob("Outputs/pkt*"):	#Create list for output packets
 	found_tgt = found.split('/')[1]			#Isolate 'pktXXXX'
 	otpt_list.append(found_tgt)				#add name to array
 
@@ -167,7 +173,7 @@ print"\n-----------------\n-----------------"
 ###Now we have a list of packets, lets compare with BERTEST definition!!
 
 for target in range(len(inpt_list)):
-	BERTEST(inpt_list[target])  #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
+	BERTEST(inpt_list[target]) 				 #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
 	
 ####PRINTING FINAL RESULTS OF BER TEST--------------------------------------------------------------------------------------------
 print "\n---FINAL RESULTS---\n"
