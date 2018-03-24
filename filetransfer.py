@@ -12,6 +12,7 @@ import sys,os
 import fileManip 		#import split/comb def...Remember that this file must be in same diectory as sender.py!!
 import time
 import numpy as np
+from shutil import rmtree as delete
 #steps:
 #1. get jpeg and split file into parts
 #2. take each segment and add preamble,length, and name of segment
@@ -23,6 +24,8 @@ import numpy as np
 #---------------------------step 1-------------------------------------------------------------
 ##Take  test jpeg file in directory and split it using fileManip definitions
 intial = time.clock()
+
+os.makedirs("INPUT") # Create the input folder to house the file partitions while code is running.
 
 orig_file = 'sat_pic.JPG' #grab file name from cmd input
 prefix = 'INPUT/pkt'			#Using string 'pic' for header later
@@ -47,6 +50,7 @@ print "file_list:",file_list				#PRINT file_list(debug)
 
 
 lenfieldsize =4 					#length added after filename will be four bytes exactly
+new = packetize(preamble = preamble)					#create packetize class for data
 for z in range(len(file_list)):
 	tgt = open("INPUT/"+file_list[z],'rb')	#open each segment to variable 'tgt'
 	pyld = tgt.read()					#actual pyld of pkt
@@ -63,7 +67,6 @@ for z in range(len(file_list)):
 ##END LEN HEADER CREATION		---------------------------------------------------------------------------		   
 	data = file_list[z] + len_header + pyld			#get orginal pyld with prefix and length header added on top
 	tgt.close()							#close tgt file, now we have our seg. pyld
-	new = packetize(preamble = preamble)					#create packetize class for data
 	segment = new.send(data)			#add header on top of data variable, store to segment variable
 	final = final + segment				#'stitch' together segments to final pyld
 	BER_CHECK += data					#Create a duplicate of expected output for BER testing without grc header
@@ -76,6 +79,7 @@ GRC_input.close()						#close file
 BER_sample = open('BER_samp.bin','wb')	#create binary file that will act as a check for BER in output bin file
 BER_sample.write(BER_CHECK)
 BER_sample.close()
+delete("INPUT") # Delete the input folder after we're done.
 final = time.clock()
 
 print "Time Elapsed for Program:",final - intial				#TIMESTAMP for lines 1 -79
