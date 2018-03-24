@@ -94,50 +94,54 @@ def BERTEST(filename_in):
 ###PACKETS DROPPED CHECK START
 ###WE first strip secondary header of of GR_rx output binary file
 #We create an output pkt and store it into the OUTPUT folder, this process ends at line 139
-print "Stripping output packets out of file and into OUTPUT folder\n-----------------\n-----------------\n-----------------"
-outputf = open("OUTPUT",'rb')		#open grc output_list.  
-lever = 1 
+#print "Stripping output packets out of file and into OUTPUT folder\n-----------------\n-----------------\n-----------------"
+#outputf = open("Output",'rb')		#open grc output_list.  
+#lever = 1 
 									#For while loop
-while(lever==1):
-	length = 0
-	name = outputf.read(7)					#read pkt name save it to variable 'name'
-	if name:
-		alpha = outputf.read(1)			#read length based on int value of each byte
-		if (not alpha) or len(alpha)==0:
-			print "\nlength of payload < field length value, escaping definition.\n"
-			lever = 0
-			break
-		length += (ord(alpha)*1000)
-		alpha = outputf.read(1)
-		if (not alpha) or len(alpha)==0:
-			print "\nlength of payload < field length value, escaping definition.\n"
-			lever = 0
-			break
-		length += (ord(alpha)*100)
-		alpha = outputf.read(1)
-		if (not alpha) or len(alpha)==0:
-			print "\nlength of payload < field length value, escaping definition.\n"
-			lever = 0
-			break
-		length += (ord(alpha)*10)
-		alpha = outputf.read(1)
-		if (not alpha) or len(alpha)==0:
-			print "\nlength of payload < field length value, escaping definition.\n"
-			lever = 0
-			break
-		length += ord(alpha)					#length calculated
-		
-		msg = outputf.read(length)			#get payload
-		r = open("OUTPUT/"+name,'wb')		#make new file at OUTPUT folder using name
-		r.write(msg)						#put payload into new file	
-		r.close() 							#close file
-	else:
-		print "DIDN'T READ DATA! ESCAPING DEFINITION
-		outputf.close()
-		lever = 0
-		break
-print "OUT pkts now in OUTPUT folder\n----------\n----------\n----------"
-###NOW we have an input segment in main dir., and its corresponding input in OUTPUT folder
+#while(lever==1):
+#	length = 0
+#	name = outputf.read(7)					#read pkt name save it to variable 'name'
+#	if name:
+#		alpha = outputf.read(1)			#read length based on int value of each byte
+#		if (not alpha) or len(alpha)==0:
+#			print "\nlength of payload < field length value, escaping definition.\n"
+#			lever = 0
+#			break
+#		length += (ord(alpha)*1000)
+#		alpha = outputf.read(1)
+#		if (not alpha) or len(alpha)==0:
+#			print "\nlength of payload < field length value, escaping definition.\n"
+#			lever = 0
+#			break
+#		length += (ord(alpha)*100)
+#		alpha = outputf.read(1)
+#		if (not alpha) or len(alpha)==0:
+#			print "\nlength of payload < field length value, escaping definition.\n"
+#			lever = 0
+#			break
+#		length += (ord(alpha)*10)
+#		alpha = outputf.read(1)
+#		if (not alpha) or len(alpha)==0:
+#			print "\nlength of payload < field length value, escaping definition.\n"
+#			lever = 0
+#			break
+#		length += ord(alpha)					#length calculated
+#		
+#		msg = outputf.read(length)			#get payload
+#		r = open("OUTPUT/"+name,'wb')		#make new file at OUTPUT folder using name
+#		r.write(msg)						#put payload into new file	
+#		r.close() 							#close file
+#	else:
+#		print "DIDN'T READ DATA! ESCAPING DEFINITION"
+#		outputf.close()
+#		lever = 0
+#		break
+#print "OUT pkts now in OUTPUT folder\n----------\n----------\n----------"
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+###NOW we have an input segment in main dir., and its corresponding output pkt in OUTPUT folder NOTE: NOW DONE IN OUTINTERPRET.py
+
 #-We have to make a list of both file groups to calculate files dropped\n------------------------------------
 otpt_list = []		#This list will have the filenames of packets we outputted from Rx grc
 inpt_list = []		#This list will have the filenames of packets we inputted into Tx grc
@@ -150,8 +154,8 @@ otpt_list.sort()						#alphabetize list for output according to string name ex['
 print "OUTPUT LIST:",otpt_list	
 
 for piece in glob.glob("INPUT/pkt*"):			#create list for input packets
-	piece_tgt = piece.splt('/')[1]			#isolate pktXXXX string for input folder pkts
-	inpt_list.append(piece)					#input file name to inpt_list
+	piece_tgt = piece.split('/')[1]			#isolate pktXXXX string for input folder pkts
+	inpt_list.append(piece_tgt)					#input file name to inpt_list
 	
 inpt_list.sort()							#alphabetize list for input from least to highest binary value
 print "INPUT LIST:",inpt_list
@@ -160,7 +164,7 @@ droppedpkt = len(inpt_list) - len(otpt_list) #use length of lists to determine #
 print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
 print"\n-----------------\n-----------------"
 	
-###Now we have a list of packets, lets compare!
+###Now we have a list of packets, lets compare with BERTEST definition!!
 
 for target in range(len(inpt_list)):
 	BERTEST(inpt_list[target])  #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
