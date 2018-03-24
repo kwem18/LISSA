@@ -95,12 +95,14 @@ def unpack(GRCOutput,pktPrefix,outputLocation,debug=0):
 
     # Parse each packet that was received
     if debug >= 3:
+        print("pktStarts: ",pktStarts)
         print("Length of pktStarts:" + str(len(pktStarts)))
     for i in range(len(pktStarts)):
         if debug >= 2:
             print("i: "+str(i))
         ind = pktStarts[i]  # This is the first index where the packet starts in the GRC file
         name = rx[ind:ind+7]  # Get the name of the file from the packet.
+        print("Name index: ",ind,"to",ind+7)
         if name != pktPrefix+str(9999):  # packets 9999 are used for syncronization and not saved.
             # Determine the length of the received file.
             length = 0
@@ -109,13 +111,13 @@ def unpack(GRCOutput,pktPrefix,outputLocation,debug=0):
                 temp = temp * int(np.power(10,(3-j)))
                 length += temp
             # Grab the from the body of the packet determined based on the length
-            data = rx[ind+10:ind+10+length]
+            data = rx[ind+11:ind+11+length]
             if debug >= 1:
                 print("\nname: "+name)
                 print("length: "+str(length))
                 print("Data Length: "+str(len(data)))
                 print("Data Range: "+str(ind+10) + " to " + str(ind+10+length))
-                print("data: "+data)
+                #print("data: "+data)
 
             # Save the packet to the expected location. After this it should be set to use fileComb
             pktSegment = open(outputLocation+name,'wb')
