@@ -25,7 +25,7 @@ import numpy as np
 intial = time.clock()
 
 orig_file = 'sat_pic.JPG' #grab file name from cmd input
-prefix = 'pkt'			#Using string 'pic' for header later
+prefix = 'INPUT/pkt'			#Using string 'pic' for header later
 preamble = 26530			#preamble for 'skipheader' gnuradio block
 fsize = 1000			#Size of segments we want for split def (in bytes)
 
@@ -37,8 +37,8 @@ final = ''			#final variable will hold compilationf of msg pylds that will have 
 file_list = []		#This list will contain the filesnames of file segments
 BER_CHECK = ''
 print "----------------------------------------\nBEGIN FILE_LIST APPEND\n----------------------------------------"
-for found in glob.glob("pkt*"):
-	#found = found.split('/')[1]	#create Nx2 list by seperating file name from prefix (OUTDATED)
+for found in glob.glob(prefix+"*"):
+	found = found.split('/')[1]	#create Nx2 list by seperating file name from prefix (OUTDATED)
 	#print "found=:",found		#check whats the string in question
 	file_list.append(found)		#add string into file_list[]
 file_list.sort()
@@ -48,7 +48,7 @@ print "file_list:",file_list				#PRINT file_list(debug)
 
 lenfieldsize =4 					#length added after filename will be four bytes exactly
 for z in range(len(file_list)):
-	tgt = open(file_list[z],'rb')	#open each segment to variable 'tgt'
+	tgt = open("INPUT/"+file_list[z],'rb')	#open each segment to variable 'tgt'
 	pyld = tgt.read()					#actual pyld of pkt
 ##THIS SECTION IS FOR HEADER FIELD CREATION ATTACHMENT----------------------------------------------------------
 	pyld_len = len(pyld)				#get length of pyld in BYTES
@@ -63,7 +63,7 @@ for z in range(len(file_list)):
 ##END LEN HEADER CREATION		---------------------------------------------------------------------------		   
 	data = file_list[z] + len_header + pyld			#get orginal pyld with prefix and length header added on top
 	tgt.close()							#close tgt file, now we have our seg. pyld
-	new = packetize()					#create packetize class for data
+	new = packetize(preamble = preamble)					#create packetize class for data
 	segment = new.send(data)			#add header on top of data variable, store to segment variable
 	final = final + segment				#'stitch' together segments to final pyld
 	BER_CHECK += data					#Create a duplicate of expected output for BER testing without grc header
