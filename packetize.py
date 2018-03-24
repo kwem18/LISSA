@@ -2,7 +2,7 @@
 # Packetize data for demod
 # Sends data to udp block in GNURadio
 
-import socket
+import socket, os, re, datetime
 import numpy as np
 
 
@@ -67,14 +67,14 @@ def strSearch(mainString,searchPhrase):
     indexs = [m.start() for m in re.finditer(searchPhrase,mainString)]
     return indexs
 
-def unpack(GRCOutput,pktPrefix,outputLocation):
+def unpack(GRCOutput,pktPrefix,outputLocation,debug=0):
 
     # This code was writen where the file location would not be specified with a forward slash at the end.
     # This if statement removes the forward slash if it was included.
-    if outputLocation[len(outputLocation-1)] == "/":
+    if outputLocation[len(outputLocation)-1] == "/":
         outputLocation = outputLocation[:len(outputLocation-2)]
 
-    if len(split(prefix,"/")) > 1:
+    if len(pktPrefix.split("/")) > 1:
         raise ValueError("prefix should not be a file path!")
 
     # Setup the save location for the file segments
@@ -94,10 +94,14 @@ def unpack(GRCOutput,pktPrefix,outputLocation):
     pktStarts = strSearch(rx,pktPrefix)
 
     # Parse each packet that was received
+    if debug >= 3:
+        print("Length of pktStarts:" + str(len(pktStarts)))
     for i in range(len(pktStarts)):
+        if debug >= 2:
+            print("i: "+str(i))
         ind = pktStarts[i]  # This is the first index where the packet starts in the GRC file
         name = rx[ind:ind+7]  # Get the name of the file from the packet.
-        if name != filePrefix+str(9999):  # packets 9999 are used for syncronization and not saved.
+        if name != pktPrefix+str(9999):  # packets 9999 are used for syncronization and not saved.
             # Determine the length of the received file.
             length = 0
             for j in range(4):
@@ -110,6 +114,7 @@ def unpack(GRCOutput,pktPrefix,outputLocation):
                 print("\nname: "+name)
                 print("length: "+str(length))
                 print("Data Length: "+str(len(data)))
+                print("Data Range: "+str(ind+10) + " to " + str(ind+10+length))
                 print("data: "+data)
 
             # Save the packet to the expected location. After this it should be set to use fileComb
@@ -118,6 +123,6 @@ def unpack(GRCOutput,pktPrefix,outputLocation):
             pktSegment.close()
         else:
             print("Sync packet. Don't save.")
-            
+
     # Return the output location, since it might not match what was asked for.
     return outputLocation

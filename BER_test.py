@@ -74,17 +74,28 @@ def BERTEST(filename_in):
 	f.close()								#CLOSE INPUT TEST FILE
 	h.close()								#CLOSE OUTPUT FILE
 	bit_error_count = 0							 #counter for number of bit inconsistencies
-	for x in range(len(input_list)):					#for loop uses x at byte value, and y as bit number 
+	for x in range(len(input_list)):					#for loop uses x at byte value, and y as bit number
+		flag = 0
 		for y in range(len(input_list[0])):
 			if input_list[x][y] == output_list[x][y]:		#Nothing happens if bit locations from both lists are the same
 				continue
 			else:											#difference in bit value leads to acknowledgment of a bi error
 				bit_error_count += 1
-				print "Bit error at byte",x
-				print "at bit number", y
-				print "INPUT  BYTE:",input_list[x]			#show byte where error occurred
-				print "OUTPUT BYTE:",output_list[x]
-				print "\n------------------------------------------------"
+				flag = 1
+		if flag == 1:
+			dif = "["
+			for i in range(8):
+				if input_list[x][i] == output_list[x][i]:
+					dif = dif + " , "
+				else:
+					dif = dif + "x, "
+			dif = dif[0:23] + "]"
+
+			print "Bit error at byte",x
+			print "INPUT  BYTE:",input_list[x]			#show byte where error occurred
+			print "OUTPUT BYTE:",output_list[x]
+			print "            ",dif
+			#print "\n------------------------------------------------"
 	pkt_bit_loss = Decimal(bit_error_count)/Decimal(len(input_list)*8)
 	avg_bit_loss.append(pkt_bit_loss) 			#Add percentage loss to grand list, will divide by existing pkts later in main function
 	total_bit_loss.append(pkt_bit_loss) 		#Add percentage to grand total for plot
