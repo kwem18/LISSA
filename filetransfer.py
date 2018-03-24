@@ -73,13 +73,26 @@ for z in range(len(file_list)):
 	#if (z==1):							#IADDED THIS SO ONLY 2PKTS WENT THROUGH (BER TESTING)
 	#	break
 	
-GRC_input = open('TX_INPUT.bin','wb')	#create bin file that grc_tx will use as source
+###final needs 'trash pkts in case of gnu-radio syn, this means making a pkt9999 with a length of 100bytes of 'A', note it will need header stuff as well (trash-premable-length NO 2ndary header) [LISA protocol]
+dummy_pkt_len = 100
+dummy_pkt_data = ''
+dummy_pyld = 'AAAAAAAAAAAA'
+new = packetize(preamble = preamble)
+dummy_pkt_data = 'pkt9999'					#first add dummy filename
+dummy_pkt_data = dummy_pkt_data + dummy_pyld		#create one pyld of dummypkt with just pkt name
+segment = new.send(dummy_pkt_data)			#add first level header to segment variable with dummy pkt to be sent thourgh gnuradio
+final = segment + segment + segment + final + segment + segment + segment 		#ADDD 3 dummy pkts befoe and after relevant data
+##final now has pyld mized in with dummy pkts, we will write this data into the binary file that will be inputted into TX_grc
+
+
+
+GRC_input = open('TX_INPUT.bin','wb')	#create bin file that grc_tx will use as source OUTPUT of FILE
 GRC_input.write(final)					#add all segments with headers into file
 GRC_input.close()						#close file
-BER_sample = open('BER_samp.bin','wb')	#create binary file that will act as a check for BER in output bin file
-BER_sample.write(BER_CHECK)
-BER_sample.close()
-delete("INPUT") # Delete the input folder after we're done.
+#BER_sample = open('BER_samp.bin','wb')	#create binary file that will act as a check for BER in output bin file OUTPUT OF FILE
+#BER_sample.write(BER_CHECK)
+#BER_sample.close()
+#delete("INPUT") # Delete the input folder after we're done.
 final = time.clock()
 
 print "Time Elapsed for Program:",final - intial				#TIMESTAMP for lines 1 -79
