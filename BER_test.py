@@ -63,14 +63,14 @@ def BERTEST(filename_in):
 					counter -= 1
 			
 			else:
-				print "OUTPACKET LENGTH IS LESS THAN INPUT! DROPPING PACKET",file
+				print "||||||||||||||||||||||||||||||\nOUTPACKET LENGTH IS LESS THAN INPUT! DROPPING PACKET\n||||||||||||||||||||||||||||||",file
 				return
         
 			input_list.append(byte_list)		#append byte_list into input_list ex (byte_list = [ [0,0,0,1,0,1,0,0] , [0,0,0,0,0,0,0,0] , ... ])
 			output_list.append(byte_list1)
 		else:
 			switch = 0
-			break			#Leave while loop data is fully read
+			break
 	f.close()								#CLOSE INPUT TEST FILE
 	h.close()								#CLOSE OUTPUT FILE
 	bit_error_count = 0							 #counter for number of bit inconsistencies
