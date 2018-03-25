@@ -81,7 +81,7 @@ new = packetize(preamble = preamble)
 dummy_pkt_data = 'pkt9999'					#first add dummy filename
 dummy_pkt_data = dummy_pkt_data + dummy_pyld		#create one pyld of dummypkt with just pkt name
 segment = new.send(dummy_pkt_data)			#add first level header to segment variable with dummy pkt to be sent thourgh gnuradio
-final = segment + segment + segment + final + segment + segment + segment 		#ADDD 3 dummy pkts befoe and after relevant data
+final = segment + segment + segment + final + segment + segment + segment + segment + segment + segment + segment + segment + segment		#ADDD 3 dummy pkts befoe and after relevant data
 ##final now has pyld mized in with dummy pkts, we will write this data into the binary file that will be inputted into TX_grc
 
 
