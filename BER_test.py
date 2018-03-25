@@ -14,6 +14,7 @@ import cPickle			#same as pickle module but allegedyly "1000 times faster"
 
 avg_bit_loss = []		#glbl var list avg bits lost for only rcvd pkts
 total_bit_loss = []     #percentage of bits lost for every pkt including dropped pkts
+
 #------------------------------------------------------------------------------------------------------------------------------------
 def BERTEST(filename_in):
 	global avg_bit_loss
@@ -159,59 +160,81 @@ def BERTEST(filename_in):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ###NOW we have an input segment in main dir., and its corresponding output pkt in OUTPUT folder NOTE: NOW DONE IN OUTINTERPRET.py
 
-#-We have to make a list of both file groups to calculate files dropped\n------------------------------------
-otpt_list = []		#This list will have the filenames of packets we outputted from Rx grc
-inpt_list = []		#This list will have the filenames of packets we inputted into Tx grc
-print "Calculating packets dropped...\n-----------------\n-----------------"
-for found in glob.glob("Outputs/pkt*"):	#Create list for output packets
-	found_tgt = found.split('/')[1]			#Isolate 'pktXXXX'
-	otpt_list.append(found_tgt)				#add name to array
+def test(testName,snr,folder):
+	#-We have to make a list of both file groups to calculate files dropped\n------------------------------------
+	# Reset global variables every time it's run
+	global avg_bit_loss  # glbl var list avg bits lost for only rcvd pkts
+	global total_bit_loss
+	avg_bit_loss = []
+	total_bit_loss = []
+	otpt_list = []		#This list will have the filenames of packets we outputted from Rx grc
+	inpt_list = []		#This list will have the filenames of packets we inputted into Tx grc
+	print "Calculating packets dropped...\n-----------------\n-----------------"
+	for found in glob.glob("Outputs/pkt*"):	#Create list for output packets
+		found_tgt = found.split('/')[1]			#Isolate 'pktXXXX'
+		otpt_list.append(found_tgt)				#add name to array
 
-otpt_list.sort()						#alphabetize list for output according to string name ex['pic0','pic1'.....]
-print "OUTPUT LIST:",otpt_list	
+	otpt_list.sort()						#alphabetize list for output according to string name ex['pic0','pic1'.....]
+	print "OUTPUT LIST:",otpt_list
 
-for piece in glob.glob("INPUT/pkt*"):			#create list for input packets
-	piece_tgt = piece.split('/')[1]			#isolate pktXXXX string for input folder pkts
-	inpt_list.append(piece_tgt)					#input file name to inpt_list
-	
-inpt_list.sort()							#alphabetize list for input from least to highest binary value
-print "INPUT LIST:",inpt_list
-droppedpkt = len(inpt_list) - len(otpt_list) #use length of lists to determine # of pkts dropped
+	for piece in glob.glob("INPUT/pkt*"):			#create list for input packets
+		piece_tgt = piece.split('/')[1]			#isolate pktXXXX string for input folder pkts
+		inpt_list.append(piece_tgt)					#input file name to inpt_list
 
-print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
-print"\n-----------------\n-----------------"
-	
-###Now we have a list of packets, lets compare with BERTEST definition!!
+	inpt_list.sort()							#alphabetize list for input from least to highest binary value
+	print "INPUT LIST:",inpt_list
+	droppedpkt = len(inpt_list) - len(otpt_list) #use length of lists to determine # of pkts dropped
 
-for target in range(len(inpt_list)):
-	BERTEST(inpt_list[target]) 				 #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
-	
-####PRINTING FINAL RESULTS OF BER TEST--------------------------------------------------------------------------------------------
-print "\n---FINAL RESULTS---\n"
+	print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
+	print"\n-----------------\n-----------------"
 
-droppedpkt = Decimal(droppedpkt)/Decimal(len(inpt_list))		#calculate % of pkts lost
+	###Now we have a list of packets, lets compare with BERTEST definition!!
 
-#droppedpkt = droppedpkt/len(inpt_list)
-pcnt_loss = Decimal(0)
-for datapoint in range(len(avg_bit_loss)):			#calcualte % loss rate for rcved pkts only
-	pcnt_loss += avg_bit_loss[datapoint]
-pcnt_loss = pcnt_loss/Decimal(len(otpt_list))				#FInal average of % loss rate for rcvd pkts exclusively
-print "Percentage of packets dropped:",droppedpkt*100
-print "Average percentage of bits lost per received packet:",pcnt_loss*100
-print "\nNOTE: This average percentage does not include dropped packets.\n"
+	for target in range(len(inpt_list)):
+		BERTEST(inpt_list[target]) 				 #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
 
-###GRAPH data loss vs pkts rcvd
-grph =plot(total_bit_loss,'-b')	#plot array of % of bits lost for each packet rcvd or not
-title('Bit Error Rate vs Packet Number')	#State title to be printed on graph
-ylabel('Percentage of bits lost (BER)')		#Print Y-axis label of plot 'grph'
-xlabel('Packet number')						#Print x-axis label of plot 'grph'
-###save grpah using pickle module
-#graphfilename = 'BERplot.pickle'
-#cPickle.dump(grph,file(graphfilename,'wb'))		#pickle module creates file in directory to be opened later
-#Open and show graph in gnome termminal so ber_test.py can continue to run
-show()							#show graph, program will continue after plot is closed
+	####PRINTING FINAL RESULTS OF BER TEST--------------------------------------------------------------------------------------------
+	print "\n---FINAL RESULTS---\n"
 
-#call(['gnome-terminal','--','./pickle_open.py']) #Opens graph for TX (TURN OFF ACTION TBD)
+	droppedpkt = Decimal(droppedpkt)/Decimal(len(inpt_list))		#calculate % of pkts lost
+
+	#droppedpkt = droppedpkt/len(inpt_list)
+	pcnt_loss = Decimal(0)
+	for datapoint in range(len(avg_bit_loss)):			#calcualte % loss rate for rcved pkts only
+		pcnt_loss += avg_bit_loss[datapoint]
+	pcnt_loss = pcnt_loss/Decimal(len(otpt_list))				#FInal average of % loss rate for rcvd pkts exclusively
+	print "Percentage of packets dropped:",droppedpkt*100
+	print "Average percentage of bits lost per received packet:",pcnt_loss*100
+	print "\nNOTE: This average percentage does not include dropped packets.\n"
+
+	###GRAPH data loss vs pkts rcvd
+#	grph =plot(total_bit_loss,'-b')	#plot array of % of bits lost for each packet rcvd or not
+#	title('Bit Error Rate vs Packet Number')	#State title to be printed on graph
+#	ylabel('Percentage of bits lost (BER)')		#Print Y-axis label of plot 'grph'
+#	xlabel('Packet number')						#Print x-axis label of plot 'grph'
+	###save data using pickle module
+	filename = 'BER.'+str(testName)+'.SNR'+str(snr)
+	# Check if the filename already exists. If it does append (#) to it.
+	num = 1
+	filenameNew = filename + '.pickle'
+	while os.path.exists(filenameNew):
+		filenameNew = filename + "("+str(num)+").pickle"
+		num = num + 1
+	filename = filenameNew
+	cPickle.dump(grph,file(str(folder)+'/'+filename,'wb'))		#pickle module creates file in directory to be opened later
+	#Open and show graph in gnome termminal so ber_test.py can continue to run
+	show()							#show graph, program will continue after plot is closed
+
+	#call(['gnome-terminal','--','./pickle_open.py']) #Opens graph for TX (TURN OFF ACTION TBD)
 
 
-print "\nEND TEST\n-----------------------------------------------------"
+	print "\nEND TEST\n-----------------------------------------------------"
+
+# if the code is called from the terminal, get input and run function.
+if __name__=='__main__':
+	testName = raw_input("Please enter a test name: ")
+	folder = raw_input("Please enter a folder for the results to be saved in: ")
+	snr = raw_input("Please enter the SNR of the test: ")
+	if not os.path.exists(folder):
+		os.makedirs(folder)
+	test(testName,snr,folder)

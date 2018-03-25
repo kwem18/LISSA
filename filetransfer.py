@@ -12,6 +12,7 @@ import sys,os
 import fileManip 		#import split/comb def...Remember that this file must be in same diectory as sender.py!!
 import time
 import numpy as np
+import shutil			# Used to delete input folder and input folder contents if it already exists
 from shutil import rmtree as delete
 #steps:
 #1. get jpeg and split file into parts
@@ -24,6 +25,9 @@ from shutil import rmtree as delete
 #---------------------------step 1-------------------------------------------------------------
 ##Take  test jpeg file in directory and split it using fileManip definitions
 intial = time.clock()
+
+if os.path.exists("INPUT"):
+	shutil.rmtree("INPUT")
 
 os.makedirs("INPUT") # Create the input folder to house the file partitions while code is running.
 

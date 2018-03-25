@@ -2,7 +2,7 @@
 # Packetize data for demod
 # Sends data to udp block in GNURadio
 
-import socket, os, re, datetime
+import socket, os, re, datetime,shutil
 import numpy as np
 
 
@@ -67,7 +67,7 @@ def strSearch(mainString,searchPhrase):
     indexs = [m.start() for m in re.finditer(searchPhrase,mainString)]
     return indexs
 
-def unpack(GRCOutput,pktPrefix,outputLocation,debug=0):
+def unpack(GRCOutput,pktPrefix,outputLocation,delete=0,debug=0):
 
     # This code was writen where the file location would not be specified with a forward slash at the end.
     # This if statement removes the forward slash if it was included.
@@ -78,12 +78,17 @@ def unpack(GRCOutput,pktPrefix,outputLocation,debug=0):
         raise ValueError("prefix should not be a file path!")
 
     # Setup the save location for the file segments
-    if os.path.exists(outputLocation):  # If the folder already exists, tag the time on the back so no data is deleted.
-        date = datetime.datetime.now().strftime("%y-%m-%d-%H-%M")
-        outputLocation = outputLocation+"-"+date
-        print("Files saved in: " + outputLocation)
+    if delete == 0: # Don't delete the old unpacked files
+        if os.path.exists(outputLocation):  # If the folder already exists, tag the time on the back so no data is deleted.
+            date = datetime.datetime.now().strftime("%y-%m-%d-%H-%M")
+            outputLocation = outputLocation+"-"+date
+    else: # Do delete the old unpacked files
+        if os.path.exists(outputLocation):  # If the folder already exists, tag the time on the back so no data is deleted.
+            shutil.rmtree(outputLocation)
     outputLocation = outputLocation + "/"  # Add the forward slash for the file path.
+    print("Files saved in: " + outputLocation)
     os.makedirs(outputLocation)
+
 
     # Load the output from the GRC file in as a string.
     rxFile = open(GRCOutput,'rb')
@@ -128,3 +133,20 @@ def unpack(GRCOutput,pktPrefix,outputLocation,debug=0):
 
     # Return the output location, since it might not match what was asked for.
     return outputLocation
+
+if __name__=='__main__':
+    print("Only unpacking functionality is supported when called from terminal.")
+    GRCOutput = raw_input("GRC Output file: ")
+    pktPrefix = raw_input("Level 2 packet prefix(file names): ")
+    outputLocation = raw_input("Folder where outputs will go: ")
+    if os.path.exists(outputLocation):
+        delete = raw_input("Remove old outputs folder? (y/n) ")
+        if delete == "y":
+            delete = 1
+        elif delete == 'n':
+            delete = 0
+        else:
+            raise ValueError("Answer must be y or n")
+    else:
+        delete = 0
+    unpack(GRCOutput, pktPrefix, outputLocation, delete=delete, debug=0)
