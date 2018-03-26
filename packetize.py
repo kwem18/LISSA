@@ -4,6 +4,7 @@
 
 import socket, os, re, datetime,shutil
 import numpy as np
+import math
 
 
 class packetize():
@@ -62,10 +63,12 @@ class packetize():
         self.sock.close()
         self.sock.shutdown()
 
+
 # Used in unpack to search through strings to find the index of the start of substrings
 def strSearch(mainString,searchPhrase):
     indexs = [m.start() for m in re.finditer(searchPhrase,mainString)]
     return indexs
+
 
 def unpack(GRCOutput,pktPrefix,outputLocation,delete=0,debug=0):
 
@@ -86,7 +89,8 @@ def unpack(GRCOutput,pktPrefix,outputLocation,delete=0,debug=0):
         if os.path.exists(outputLocation):  # If the folder already exists, tag the time on the back so no data is deleted.
             shutil.rmtree(outputLocation)
     outputLocation = outputLocation + "/"  # Add the forward slash for the file path.
-    print("Files saved in: " + outputLocation)
+    if debug >= 0:
+        print("Files saved in: " + outputLocation)
     os.makedirs(outputLocation)
 
 
@@ -106,47 +110,85 @@ def unpack(GRCOutput,pktPrefix,outputLocation,delete=0,debug=0):
         if debug >= 2:
             print("i: "+str(i))
         ind = pktStarts[i]  # This is the first index where the packet starts in the GRC file
-        name = rx[ind:ind+7]  # Get the name of the file from the packet.
-        print("Name index: ",ind,"to",ind+7)
-        if name != pktPrefix+str(9999):  # packets 9999 are used for syncronization and not saved.
-            # Determine the length of the received file.
-            length = 0
-            for j in range(4):
-                temp = ord(rx[ind+7+j])
-                temp = temp * int(np.power(10,(3-j)))
-                length += temp
-            # Grab the from the body of the packet determined based on the length
-            data = rx[ind+11:ind+11+length]
-            if debug >= 1:
-                print("\nname: "+name)
-                print("length: "+str(length))
-                print("Data Length: "+str(len(data)))
-                print("Data Range: "+str(ind+10) + " to " + str(ind+10+length))
-                #print("data: "+data)
+        try:
+            name = rx[ind:ind+7]  # Get the name of the file from the packet.
 
-            # Save the packet to the expected location. After this it should be set to use fileComb
-            pktSegment = open(outputLocation+name,'wb')
-            pktSegment.write(data)
-            pktSegment.close()
-        else:
-            print("Sync packet. Don't save.")
+            # Check to make sure the packet name is not corrupt
+            legalName = 1  # The packet is innocent until proven guilty (have to prove its illegal)
+            if name == pktPrefix+str(9999): # We don't want to save synchronization packets, so they are illegal.
+                legalName = 0
+            try:
+                nameNumber = name[len(pktPrefix):len(pktPrefix)+5] # Get the number suffix from the name
+                int(nameNumber) # Attempt to convert the number to a integer.
+            except:
+                # The field that should be a number was not. This means the packet name is corrupt
+                legalName = 0
+
+            if debug >= 1:
+                print("\nname: " + name)
+            if debug >=3:
+                print"legalName:",legalName
+
+            #If the packet has a legal name, we unpack it.
+            if legalName:  # If the packet name is legal, parse it.
+
+                # Determine the length of the received file.
+                length = 0
+                for j in range(4):
+                    temp = ord(rx[ind+7+j])
+                    temp = temp * int(np.power(10,(3-j)))
+                    length += temp
+                # Validate length
+                legalLength = 1
+                if length >= 9999:
+                    if debug >= 1:
+                        print"Illegal Length. Dropping Packet."
+                    legalLength = 0
+                if debug >= 1:
+                    print("length: "+str(length))
+
+                if legalLength:  # if the packet length was legal, the packet and data will be saved.
+                    # Grab the from the body of the packet determined based on the length
+                    data = rx[ind+11:ind+11+length]
+                    if debug >= 2:
+                        print("Data Length: "+str(len(data)))
+                    if debug >= 3:
+                        print("Data Range: "+str(ind+10) + " to " + str(ind+10+length))
+                    if debug >= 4:
+                        print("data: "+data)
+
+                    # Save the packet to the expected location. After this it should be set to use fileComb
+                    pktSegment = open(outputLocation + name, 'wb')
+                    pktSegment.write(data)
+                    pktSegment.close()
+            else:
+                if debug >= 1:
+                    print("Corrupt packet name (or sync packet). Don't save.")
+        except IndexError:
+            if debug >= 0:
+                print("caught index error.")
+                print("ind:",pktStarts[i])
+            pass
 
     # Return the output location, since it might not match what was asked for.
     return outputLocation
 
 if __name__=='__main__':
     print("Only unpacking functionality is supported when called from terminal.")
-    GRCOutput = raw_input("GRC Output file: ")
-    pktPrefix = raw_input("Level 2 packet prefix(file names): ")
-    outputLocation = raw_input("Folder where outputs will go: ")
-    if os.path.exists(outputLocation):
-        delete = raw_input("Remove old outputs folder? (y/n) ")
-        if delete == "y":
-            delete = 1
-        elif delete == 'n':
-            delete = 0
-        else:
-            raise ValueError("Answer must be y or n")
-    else:
-        delete = 0
-    unpack(GRCOutput, pktPrefix, outputLocation, delete=delete, debug=0)
+    # GRCOutput = raw_input("GRC Output file: ")
+    # pktPrefix = raw_input("Level 2 packet prefix(file names): ")
+    # outputLocation = raw_input("Folder where outputs will go: ")
+    # if os.path.exists(outputLocation):
+    #     delete = raw_input("Remove old outputs folder? (y/n) ")
+    #     if delete == "y":
+    #         delete = 1
+    #     elif delete == 'n':
+    #         delete = 0
+    #     else:
+    #         raise ValueError("Answer must be y or n")
+    # else:
+    #     delete = 0
+    GRCOutput = 'Output'
+    pktPrefix = 'pkt'
+    outputLocation = 'Outputs'
+    unpack(GRCOutput, pktPrefix, outputLocation, delete=1, debug=1)

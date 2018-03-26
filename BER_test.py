@@ -5,7 +5,6 @@
 from subprocess import call		#For gnome terminal call cmd
 from pathlib import Path
 from matplotlib.pyplot import *		#FOr data gathering
-from decimal import *				#for percentage calcuation
 import os
 import sys
 import time
@@ -16,26 +15,29 @@ avg_bit_loss = []		#glbl var list avg bits lost for only rcvd pkts
 total_bit_loss = []     #percentage of bits lost for every pkt including dropped pkts
 
 #------------------------------------------------------------------------------------------------------------------------------------
-def BERTEST(filename_in):
+def BERTEST(filename_in,debug=0):
 	global avg_bit_loss
 	global total_bit_loss
 	file = str(filename_in)				#INPUT FILENAME MUST BE PUT IN HERE
 	filecheck0= "INPUT/" + file			#Path of input pkt at INPUT folder of directory
 	filecheck1 = "Outputs/"+ file		#Path of POSSIBLE received packet at OUTPUT folder of directory
-	print "BERTEST for packet:",file	#State the name of pkt we are hecking for inconsistencies with test pkt
+	if debug >= 0:
+		print "BERTEST for packet:",file	#State the name of pkt we are hecking for inconsistencies with test pkt
 	fpath0 = Path(filecheck0)					#designates the path of input filename with respect to main directory
 	fpath = Path(filecheck1)				#designates the path of output filename with respect to main directory
 	
 	if (fpath0.is_file() & fpath.is_file()):
-		print "/////////////////////////////////////////////////////////////////////////////\nPACKET exists for:",file
-		print "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n"
+		if debug >= 1:
+			print "/////////////////////////////////////////////////////////////////////////////\nPACKET exists for:",file
+			print "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n"
 			  
 		
 	else:
-		total_bit_loss.append(Decimal(1))  #acknowledge 100% which implies lost pkt for plot graph of %bitloss vs pktnumber
-		print "\n##############################\nPACKET DROPPED for:",file
-		print "##############################\n"
-		print "-----------------------------------------------------------------------------#\n"
+		total_bit_loss.append(float(1))  #acknowledge 100% which implies lost pkt for plot graph of %bitloss vs pktnumber
+		if debug >= 1:
+			print "\n##############################\nPACKET DROPPED for:",file
+			print "##############################\n"
+			print "-----------------------------------------------------------------------------#\n"
 		return
 		
 	f = open(filecheck0,'rb')					#ACESS TEST FILE in INPUT FOLDER
@@ -64,7 +66,8 @@ def BERTEST(filename_in):
 					counter -= 1
 			
 			else:
-				print "||||||||||||||||||||||||||||||\nOUTPACKET LENGTH IS LESS THAN INPUT! DROPPING PACKET\n||||||||||||||||||||||||||||||",file
+				if debug >= 0:
+					print "||||||||||||||||||||||||||||||\nOUTPACKET LENGTH IS LESS THAN INPUT! DROPPING PACKET\n||||||||||||||||||||||||||||||",file
 				return
         
 			input_list.append(byte_list)		#append byte_list into input_list ex (byte_list = [ [0,0,0,1,0,1,0,0] , [0,0,0,0,0,0,0,0] , ... ])
@@ -92,17 +95,19 @@ def BERTEST(filename_in):
 					dif = dif + "x, "
 			dif = dif[0:23] + "]"
 
-			print "Bit error at byte",x
-			print "INPUT  BYTE:",input_list[x]			#show byte where error occurred
-			print "OUTPUT BYTE:",output_list[x]
-			print "            ",dif
+			if debug >= 1:
+				print "Bit error in packet ",file,"at byte",x
+				print "INPUT  BYTE:",input_list[x]			#show byte where error occurred
+				print "OUTPUT BYTE:",output_list[x]
+				print "            ",dif
 			#print "\n------------------------------------------------"
-	pkt_bit_loss = Decimal(bit_error_count)/Decimal(len(input_list)*8)
+	pkt_bit_loss = float(bit_error_count)/float(len(input_list)*8)
 	avg_bit_loss.append(pkt_bit_loss) 			#Add percentage loss to grand list, will divide by existing pkts later in main function
 	total_bit_loss.append(pkt_bit_loss) 		#Add percentage to grand total for plot
-	print "Percentage of bits lost:",pkt_bit_loss		#Print BER for pkt being checked at the the time of defintion being used
-	print "\nEND BERTEST OF:",file
-	print "\n-----------------------------------------------------------------------------#\n"
+	if debug >= 0:
+		print "Percentage of bits lost:",pkt_bit_loss		#Print BER for pkt being checked at the the time of defintion being used
+		print "\nEND BERTEST OF:",file
+		print "\n-----------------------------------------------------------------------------#\n"
 	return 	#Leave definition		
 	
 	
@@ -160,7 +165,7 @@ def BERTEST(filename_in):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ###NOW we have an input segment in main dir., and its corresponding output pkt in OUTPUT folder NOTE: NOW DONE IN OUTINTERPRET.py
 
-def test(testName,snr,folder):
+def test(testName,snr,folder,debug=0):
 	#-We have to make a list of both file groups to calculate files dropped\n------------------------------------
 	# Reset global variables every time it's run
 	global avg_bit_loss  # glbl var list avg bits lost for only rcvd pkts
@@ -169,43 +174,52 @@ def test(testName,snr,folder):
 	total_bit_loss = []
 	otpt_list = []		#This list will have the filenames of packets we outputted from Rx grc
 	inpt_list = []		#This list will have the filenames of packets we inputted into Tx grc
-	print "Calculating packets dropped...\n-----------------\n-----------------"
+	if debug >= 1:
+		print "Calculating packets dropped...\n-----------------\n-----------------"
 	for found in glob.glob("Outputs/pkt*"):	#Create list for output packets
 		found_tgt = found.split('/')[1]			#Isolate 'pktXXXX'
 		otpt_list.append(found_tgt)				#add name to array
 
 	otpt_list.sort()						#alphabetize list for output according to string name ex['pic0','pic1'.....]
-	print "OUTPUT LIST:",otpt_list
+	if debug >= 1:
+		print "OUTPUT LIST:",otpt_list
 
 	for piece in glob.glob("INPUT/pkt*"):			#create list for input packets
 		piece_tgt = piece.split('/')[1]			#isolate pktXXXX string for input folder pkts
 		inpt_list.append(piece_tgt)					#input file name to inpt_list
 
 	inpt_list.sort()							#alphabetize list for input from least to highest binary value
-	print "INPUT LIST:",inpt_list
+	if debug >= 1:
+		print "INPUT LIST:",inpt_list
 	droppedpkt = len(inpt_list) - len(otpt_list) #use length of lists to determine # of pkts dropped
-
-	print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
-	print"\n-----------------\n-----------------"
+	if debug >= 1:
+		print"\nTOTAL NUMBER OF PACKETS DROPPED:",droppedpkt
+		print"\n-----------------\n-----------------"
 
 	###Now we have a list of packets, lets compare with BERTEST definition!!
 
 	for target in range(len(inpt_list)):
-		BERTEST(inpt_list[target]) 				 #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
+		BERTEST(inpt_list[target],debug=-1) 				 #BERTEST uses filenames of inpt_list in order to see whihc specific pkts were dropped/received and what bit errors the have if received
 
 	####PRINTING FINAL RESULTS OF BER TEST--------------------------------------------------------------------------------------------
-	print "\n---FINAL RESULTS---\n"
+	if debug >= 0:
+		print"------------------------------- Final Result -------------------------------"
 
-	droppedpkt = Decimal(droppedpkt)/Decimal(len(inpt_list))		#calculate % of pkts lost
+	droppedpkt = float(droppedpkt)/float(len(inpt_list))		#calculate % of pkts lost
 
-	#droppedpkt = droppedpkt/len(inpt_list)
-	pcnt_loss = Decimal(0)
-	for datapoint in range(len(avg_bit_loss)):			#calcualte % loss rate for rcved pkts only
-		pcnt_loss += avg_bit_loss[datapoint]
-	pcnt_loss = pcnt_loss/Decimal(len(otpt_list))				#FInal average of % loss rate for rcvd pkts exclusively
-	print "Percentage of packets dropped:",droppedpkt*100
-	print "Average percentage of bits lost per received packet:",pcnt_loss*100
-	print "\nNOTE: This average percentage does not include dropped packets.\n"
+	if len(otpt_list) == 0:
+		if debug >= 0:
+			print "No packets were successfully received!"
+		pcnt_loss = 1.
+	else:
+		pcnt_loss = float(0)
+		for datapoint in range(len(avg_bit_loss)):			#calcualte % loss rate for rcved pkts only
+			pcnt_loss += avg_bit_loss[datapoint]
+		pcnt_loss = pcnt_loss/float(len(otpt_list))				#FInal average of % loss rate for rcvd pkts exclusively
+	if debug >= 0:
+		print "Percentage of packets dropped:",droppedpkt*100
+		print "Average percentage of bits lost per received packet:",pcnt_loss*100
+		print "NOTE: This average percentage does not include dropped packets."
 
 	###GRAPH data loss vs pkts rcvd
 #	grph =plot(total_bit_loss,'-b')	#plot array of % of bits lost for each packet rcvd or not
@@ -221,20 +235,20 @@ def test(testName,snr,folder):
 		filenameNew = filename + "("+str(num)+").pickle"
 		num = num + 1
 	filename = filenameNew
-	cPickle.dump(grph,file(str(folder)+'/'+filename,'wb'))		#pickle module creates file in directory to be opened later
+	cPickle.dump(total_bit_loss,file(str(folder)+'/'+filename,'wb'))		#pickle module creates file in directory to be opened later
 	#Open and show graph in gnome termminal so ber_test.py can continue to run
 	show()							#show graph, program will continue after plot is closed
 
 	#call(['gnome-terminal','--','./pickle_open.py']) #Opens graph for TX (TURN OFF ACTION TBD)
 
-
-	print "\nEND TEST\n-----------------------------------------------------"
-
 # if the code is called from the terminal, get input and run function.
 if __name__=='__main__':
-	testName = raw_input("Please enter a test name: ")
-	folder = raw_input("Please enter a folder for the results to be saved in: ")
-	snr = raw_input("Please enter the SNR of the test: ")
+	#testName = raw_input("Please enter a test name: ")
+	#folder = raw_input("Please enter a folder for the results to be saved in: ")
+	#snr = raw_input("Please enter the SNR of the test: ")
+	testName = '1.SNRTest.'
+	folder = "simTests"
+	snr = 3
 	if not os.path.exists(folder):
 		os.makedirs(folder)
-	test(testName,snr,folder)
+	test(testName,snr,folder,debug=4)

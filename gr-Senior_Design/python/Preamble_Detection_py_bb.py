@@ -50,9 +50,11 @@ class Preamble_Detection_py_bb(gr.basic_block):
                                 name="Preamble_Detection_py_bb",
                                 in_sig=[numpy.byte],
                                 out_sig=[numpy.byte])
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        print("Getting started. Preamble is set to: " + str(self.preamble))
-        print("Version 3.19.18...")
+        if self.DebugPrints >= 0:
+            print("Version 3.19.18...")
+        if self.DebugPrints >= 1:
+            print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+            print("Getting started. Preamble is set to: " + str(self.preamble))
 
     def forecast(self, noutput_items, ninput_items_required):
         # setup size of input_items[i] for work call
@@ -77,7 +79,7 @@ class Preamble_Detection_py_bb(gr.basic_block):
             if self.state == self.SEARCH:
                 # If preamble is found. Consume everything prior.
                 # Only raise a flag, do not output anything yet.
-                if self.DebugPrints >= 1:
+                if self.DebugPrints >= 2:
                     print("General: Searching: Starting.")
                 for count in range(count + 1, len(input_items[0])):
                     if self.DebugPrints >= 4:
@@ -97,11 +99,13 @@ class Preamble_Detection_py_bb(gr.basic_block):
                         self.preamblequeue = 0  # Reset the preamble queue for the next packet.
                         self.state = self.HEADER  # Enter the header state
                         break
+                    if self.preamblequeue == ~self.preamble:
+                        print("General: Searching: I THINK THAT ALL THE BITS ARE FLIPPED!!!!")
 
             # Parse through the header of the packet to determine it's properties.
             elif self.state == self.HEADER:
                 # This should be the first state entered after the preamble was found.
-                if self.DebugPrints >= 1:
+                if self.DebugPrints >= 2:
                     print("General: Header: Starting.")
                 for count in range(count + 1, len(input_items[0])):
                     self.bitqueue[0] = (self.bitqueue[0] & (
@@ -118,7 +122,7 @@ class Preamble_Detection_py_bb(gr.basic_block):
                         # Reset header values.
                         self.packet_length = 0
                         for i in range(len(self.headerqueue)):
-                            if self.DebugPrints >= 5:
+                            if self.DebugPrints >= 6:
                                 print("General: Header: Inside For Loop. Count = " + str(count))
                             if i < 4:  # This is the first section of the header, the packet length
                                 self.packet_length += self.headerqueue[i] * numpy.power(10, (3 - i))
@@ -147,7 +151,7 @@ class Preamble_Detection_py_bb(gr.basic_block):
                                 count] << self.bitcounter)) & 0xFF  # Set the bit coming into the input where it belongs
                     self.bitcounter += -1  # Decrement the bitcounter by 1.
                     if self.bitcounter == -1:  # If the bit counter is -1, then we have packed a whole bit.
-                        if self.DebugPrints>=0:
+                        if self.DebugPrints>=5:
                             print("Running: Packed Bitqueue: " + str(self.bitqueue[0]))
                         self.bitcounter = 7
                         self.received_length += 1
@@ -169,7 +173,7 @@ class Preamble_Detection_py_bb(gr.basic_block):
                 print("General: Finished Loop.")
 
         # self.consume_each(consumable)
-        if self.DebugPrints >= 1:
+        if self.DebugPrints >= 6:
             print("General: Leaving: Consuming = " + str(count + 1))
             print("General: Leaving: Outputting = " + str(data_to_output))
             if data_to_output != 0:
