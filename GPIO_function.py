@@ -73,7 +73,9 @@ class GPIO_function:
         self.clock.start()  #Run thread self.clock and therfore call def executeThread
 
     def shutdown(self):
-        self.off = int(0)                  #STOP clock(PIN C2) using self.off
+        if(self.sync==1):
+            self.off = int(0)                  #STOP clock(PIN C2) using self.off
+
         self.ft232h.output(10,GPIO.LOW)
         time.sleep(0.2)
         self.ft232h.output(8,GPIO.LOW)      #Drive control port(PIN C0) LOW
