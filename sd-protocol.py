@@ -2,11 +2,14 @@
 # Includes major functions such as prototransfer and protopack
 
 from glob import glob
+from datetime import datetime
+import os
 
 class fileTrack():
     # Written by William & Erick
     # handels functionality of prototransfer, protopack
     # Should be initialized with each picture sent!
+    SUPPORTEDTYPES = [bytearray, str, list]
 
     def __init__(self,operatingDir,preamble ='26530',filePrefix = 'pkt'):
         # Made by William
@@ -26,6 +29,7 @@ class fileTrack():
         else:
             self.operatingDir = operatingDir + "/"
 
+        self.preamble = preamble
         self.filePrefix = filePrefix
 
         # create the file list here.
@@ -36,19 +40,64 @@ class fileTrack():
             fileName = files[i].split("/")[1]
             self.fileList.append(fileName)
 
-        self.preamble = preamble
 
-
-    def ackInterp(self,ackLocation):
+    def ackInterp(self,ackLocation,delete=0):
         # Made by William
         # Interprets received Ack packets
-        # Removes acknolaged files from the file list
-        self.fileList
+        # Removes acknowledged files from the file list
+        # Expecting packet acks to come in as a comment seperated string.
+        # EG: pkt0001,pkt0002,pkt0004,pkt0006 means pkt0001, pkt0002, pkt0004 and pkt0006 were received correctly
 
-        # Returns 0 if not all packets are received
-        # Returns 1 once all packets were received
-        # All packets receieved once fileList is empty
-        return allReceived
+        ackName = "ackPack"
+
+        if type(ackLocation) != str:
+            raise TypeError("Ack Packet Location must be specified as a string!")
+
+        if not ackLocation.endswith("/"):
+            ackLocation = ackLocation + "/"
+
+        ackPack = glob(ackLocation + ackName)
+
+        if len(ackPack) == 0:
+            # There were no operation packages found.
+            return "No Op Pack"
+        elif len(ackPack) > 1:
+            # There were too amny ack files
+            raise ValueError("Too many ackfiles! They should have been deleted after being parsed.")
+
+        opFile = open(ackPack, "rb")
+        opData = opFile.read()
+        opFile.close()
+
+        # Parse opData string as described at the start of this function
+        acks = opData.split(",")
+
+        # acks is now a list of the successfully received files.
+        # Confirm that received acks are actual file names inside fileList. (if they aren't just throw them away)
+        for i in acks:
+            if not i in self.fileList:
+                acks.remove(i) # If the ack wasn't part of the file list, it must have been corrupted, we'll just drop it and resend the file.
+
+        # need to subtract acks from the fileList, so they aren't sent again.
+        self.fileList =list(set(self.fileList)^set(acks)) # Removes all acks from the file list.
+
+        # Delete or remove the old ackPack.
+        if delete == 1:
+            # Delete the file after it's parsed.
+            os.remove(ackLocation+ackName)
+        else:
+            # Rename the file after it's parsed.
+            date = datetime.now().strftime("%y-%m-%d-%H-%M")
+            newName = ackLocation + ackName + date
+            os.rename(ackLocation+ackName, newName)
+
+        # Determine the number of tiles to let to transmit.
+        filesRemaining = len(self.fileList)
+
+        # Returns number of packets that still need to be received.
+        # Once 0 is returned, all packets were received.
+        # All packets received once fileList is empty
+        return filesRemaining
 
     def filePack(self):
         # Made by Erick
@@ -58,6 +107,7 @@ class fileTrack():
     def opDataPack(self,message):
         # Made by Erick
         # Packages control messages into a format ready for GNU Radio
+        # Probably just needs to pass the message to packetize
 
     def packetize(self, data):
         # Used to add header fields to data
@@ -96,20 +146,53 @@ class fileTrack():
         return message
         # self.sock.sendto(message, (self.ip,self.port))
 
-def opDataInterp(opMessageLocation):
+def opDataInterp(opMessageLocation,delete=0):
     # Made by William
     # Interpret operational messages
-    # Accepts operating message as an input
+    # Accepts operating message folder as an input
+
+    packetName = "op_data"
+
+    if type(opMessageLocation) != str:
+        raise TypeError("Operating Packet Location must be specified as a string!")
+
+    if not opMessageLocation.endswith("/"):
+        opMessageLocation = opMessageLocation + "/"
+
+    opPack = glob(opMessageLocation+packetName)
+
+    if len(opPack) == 0:
+        # There were no opperation packages found.
+        return "No Op Pack"
+    elif len(opPack) > 1:
+        # There were too many operation packages found.
+        raise ValueError("There were too many operation packages found. They should be removed/renamed after being worked with.")
+
+    opFile = open(opPack,"rb")
+    opData = opFile.read()
+    opFile.close()
+
+    if len(opData) == 0:
+        opMessage = "Op Pack Empty"
+    elif opData == "Send Picture"
+        opMessage = "picReq"
+    elif opData == "powerOff"
+        opMessage = "reboot"
+    else:
+        opMessage = "messageError"
+
+    # Delete or rename the file so the next opPack can be interpreted
+    if delete == 1:
+        # Delete the file after it's parsed.
+        os.remove(opPack)
+    else:
+        # Rename the file after it's parsed.
+        date = datetime.now().strftime("%y-%m-%d-%H-%M")
+        newName = opMessageLocation + packetName + date
+        os.rename(opPack,newName)
+
+
 
     # Return one of the following strings
     # picture request = picReq
     return opMessage
-
-
-class packetize():
-    SUPPORTEDTYPES = [bytearray, str, list]
-
-    def __init__(self, preamble='26530'):
-        print("Setting up class")
-        self.preamble = preamble
-
