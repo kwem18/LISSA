@@ -35,9 +35,10 @@ class GPIO_function:
         self.clock = threading.Thread(target=self.executeThread)      #Thread exclusively for CLOCK (C2)
         self.clk_freq = float(25)       #Frequency of clock signal definition executeThread
         self.sync = int(sync)           #sync determines whether or not we want sequential ginsl in ADAFRUIT PIN C2
+        self.off = int(1)
 
-    def ENABLE_FEM(self,switch=0):              #Can either turn on or off enable depending on input of switch
-        initial = time.clock()                  #Start clocking in time displacem
+    def ENABLE_FEM(self,switch=0):
+        initial = time.clock()                  #Start clocking in time displacement
         if (switch == 0):                       # We want to turn off DC voltage
             print('\nFEM SHUTTING DOWN...')
             self.ft232h.output(9,GPIO.LOW)      # TURN ENABLE  GPIO OFF(DC)
@@ -53,7 +54,7 @@ class GPIO_function:
             print("Time elapsed: " + str(self.final - self.initial) )
         else:
             raise ValueError('MUST INPUT integer 1 (ON) or integer 0 (OFF)')
-            return
+
 
 
     def TX_FEM(self):
@@ -72,7 +73,8 @@ class GPIO_function:
         self.clock.start()  #Run thread self.clock and therfore call def executeThread
 
     def shutdown(self):
-        self.clock.exit()                   #STOP clock(PIN C2)
+        self.off = int(0)                  #STOP clock(PIN C2) using self.off
+        self.ft232h.output(10,GPIO.LOW)
         time.sleep(0.2)
         self.ft232h.output(8,GPIO.LOW)      #Drive control port(PIN C0) LOW
         time.sleep(0.2)
@@ -83,11 +85,15 @@ class GPIO_function:
     def executeThread(self):        #EXECUTES CLOCK SIGNAL SOFTWARE LOGIC USING GPIO PIN C2
         print('ENABLE_FEM(switch=1) called.\nCLOCK (PIN C2) START')
         while True:
-            #print "---Thread is High at {}".format(time.strftime("%H:%M:%S",time.gmtime()))
-            half_period = (float(1)/self.clk_freq)/float(2)
-            self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
-            time.sleep(half_period)
-            #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
-            self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
-            time.sleep(half_period)
+            if (self.off == 0):
+                print('CLOCK STOPPED DUE TO SHUTDOWN')
+                return
+            else:
+                #print "---Thread is High at {}".format(time.strftime("%H:%M:%S",time.gmtime()))
+                half_period = (float(1)/self.clk_freq)/float(2)
+                self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
+                time.sleep(half_period)
+                #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
+                self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
+                time.sleep(half_period)
 
