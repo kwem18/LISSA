@@ -322,7 +322,7 @@ def CREATE_CHECKSUM(pyld,len_header,pktname):
 
     ### next add header field binary data
     for thing in len_header:
-        checksum += ord(thing)
+        checksum += thing
         #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
     ###NOw we add pyld binary data
