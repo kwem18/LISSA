@@ -7,7 +7,10 @@ import GPIO_function
 import sd_protocol
 
 from datetime import datetime
+from shutil import copyfile
 import os
+
+
 
 def remote(FEMlogic,power):
     # Master program for remote device
@@ -15,15 +18,15 @@ def remote(FEMlogic,power):
     print("|||| Remote Master Program |||| ")
     print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ ')
 
-    # Create operating directory
-    operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
-    os.mkdir(operatingDir)
-
     # Initialize hardware/GRC controls
     print("Listening for picture request.")
     gr_rx = grc_rx()
     gr_tx = grc_tx(IF_Gain=power)
     FEMControl = GPIO_function(sync=FEMlogic)
+
+    # Create operating directory
+    operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
+    os.mkdir(operatingDir)
 
     FEMControl.ENABLE_FEM(switch=1)
 
@@ -87,6 +90,11 @@ def host(FEMlogic,power):
     print("||||| Host Master Program ||||| ")
     print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ ')
 
+    #Initiate GNU Radio Files
+    gr_rx = grc_rx()
+    gr_tx = grc_tx(IF_Gain = power)
+    FEMControl = GPIO_function(sync = FEMlogic)
+
     raw_input("Send Picture Request? (remote node must be running.) [enter]")
 
     # Create operating directory
@@ -95,11 +103,6 @@ def host(FEMlogic,power):
 
     # Create file manager object
     fileManager = sd_protocol.fileTrack(operatingDir,preamble="26530",filePrefix='pkt')
-
-    #Initiate GNU Radio Files
-    gr_rx = grc_rx()
-    gr_tx = grc_tx(IF_Gain = power)
-    FEMControl = GPIO_function(sync = FEMlogic)
 
     # Package picture request for transmission
     fileManager.opDataPack("Send Picture")
@@ -153,15 +156,20 @@ def prepGRC():
     # Restors python top block file for GRC file control
     # This will need to be called after every time the GRC files are run not through python
 
-    remove GRC_Files/topblock.py
-    copy saved_GRC_Files/topblock_callable.py to GRC_Files
-    rename GRC_Files/topblock_callable.py to GRC_Files/topblock.py
+    # Remove the wrong top block python files.
+    os.remove("GRC_Files/GRC_Rx.py")
+    os.remove("GRC_Files/GRC_Tx.py")
 
-    do that for both GRC_Rx and GRC_Tx.
+    # Copy in the saved, callable, python files.
+    copyfile("GRC_Rx_Callable.py", "GRC_Files")
+    copyfile("GRC_Tx_Callable.py","GRC_Files")
+
+    # Rename the python files
+    os.remove("GRC_Files/GRC_Rx.py")
+    os.remove("GRC_Files/GRC_Tx.py")
+
 
 if __name__ == "__main__":
-    sequential = raw_input("Does the connected FEM control board use sequential logic? (Yes/No): ")
-
     if 'y' in sequential or 'Y' in sequential:
         logic = 0
     elif 'n' in sequential or 'N' in sequential:
@@ -175,9 +183,21 @@ if __name__ == "__main__":
 
     remote_or_host = raw_input("Is this controlling the remote or host device? (Remote/Host): ")
 
-    if "R" in remote_or_host or "r" in remote_or_host:
-        remote(logic,power)
-    elif "H" in remote_or_host or "h" in remote_or_host:
-        host(logic,power)
-    else:
-        raise ValueError("Input must be specified as [H]ost or [R]emote.")
+    try:
+        if "R" in remote_or_host or "r" in remote_or_host:
+            remote(logic,power)
+        elif "H" in remote_or_host or "h" in remote_or_host:
+            host(logic,power)
+        else:
+            raise ValueError("Input must be specified as [H]ost or [R]emote.")
+    except TypeError as e:
+        if str(e) == "__init__() takes exactly 1 argument (2 given)":
+            prepGRC()
+            if "R" in remote_or_host or "r" in remote_or_host:
+                remote(logic, power)
+            elif "H" in remote_or_host or "h" in remote_or_host:
+                host(logic, power)
+            else:
+                raise ValueError("Input must be specified as [H]ost or [R]emote.")
+        else:
+            raise
