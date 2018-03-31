@@ -309,7 +309,7 @@ def CREATE_CHECKSUM(pyld,len_header,pktname):
     ##Typeerror checks
     if (type(pyld) != type('pyld')):
         raise TypeError('Data must be in string type')
-    if (type(len_header) != type('lenheader')):
+    if (type(len_header) != type(bytearray(1)):
         raise TypeError('Data must be in bytearray type')
     if (type(pktname) != type('pktname')):
         raise TypeError('filename must be in string type')
