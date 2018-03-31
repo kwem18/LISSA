@@ -339,40 +339,38 @@ class fileTrack():
 
 # END CHECKSUM DEFINTIONS-------------------------------------------------------------------------------------
 
-    def secondary_header(self):
+    def secondary_header(self,filename):
     #Made by Erick Terrazas
 
     ##objective is to add 2ndary header ontop of payload
     # Note: This must be done BEFORE packetize is used, otherwise header is not in correct format
     #we have self.fileList to open pkts and add pktname,length,and checksum
 
-    #1. for loop to get filename, open file, and then do whats needed to add the three header fields
-    new_payload= ''  #'New_payload is where we will order the header data with the payload data, will eventually write
-                    #  Into the file we started with
-    for list_tgt in self.fileList:
-        g = open('INPUT/'+list_tgt,'rb')   #GO to input folder and pick up pkt file
+    #1. FOR loop to get filename, open file, and then do whats needed to add the three header fields
+        g = open('INPUT/'+filename,'rb')   #GO to input folder and pick up pkt file
         payload = g.read()          #we gather up the data present in pyld
         g.close()                   #close file (for now)
 
         ###Lets calculate the length of payload and format it as necessary
-        lengthfieldsize = 4                     #predetermined numerical length of length field in bytes
+        l_fieldsize = 4                     #predetermined numerical length of length field in bytes
         pyld_len = len(payload)
         fieldarray = list(str(pyld_len))        #create empty list as long as numerical value of pyld_len
-        len_field = np.pad(fieldarray,[lenfieldsize-len(fieldarray),0],"constant",constant_values=0)
-        tmp = 0*lengthfieldsize
+        len_field = np.pad(fieldarray,[l_fieldsize-len(fieldarray),0],"constant",constant_values=0)
+        tmp = [0]*l_fieldsize
 
-        for index in range (len(lenfield)):
-            if (lenfield[index] == ''):
+        for index in range(len(lenfield)):
+            if lenfield[index] == '':
                 lenfield[index] = int(lenfield[index])
             tmp[i] = int(lenfield[index])
         pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
 
         ###LEts create checksum by calling CREATE_CHECKSUM definition
-        pkt_checksum_header = CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = self.fileList[index])
+        pkt_checksum_header = CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = list_tgt)
 
-        ###Now lets call file again and write new data on top of pyld
-        n = open('INPUT'+list_tgt,'wb')
-        new_payload = list_tgt + pkt_length_header + pkt_checksum_header + payload
-        n.write(new_payload)
-        n.close()
+        ###Now lets add 2ndary header in oorrect format and add on top of original paylod
+
+        new_payload = filename + pkt_length_header + pkt_checksum_header + payload
+
+        return new_payload
+
 
