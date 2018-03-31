@@ -181,160 +181,198 @@ class fileTrack():
         message = syncdata + header + data
         return message
 
-def opDataInterp(opMessageLocation,delete=0):
-    # Made by William
-    # Interpret operational messages
-    # Accepts operating message folder as an input
+    def opDataInterp(opMessageLocation,delete=0):
+        # Made by William
+        # Interpret operational messages
+        # Accepts operating message folder as an input
 
-    packetName = "op_data"
+        packetName = "op_data"
 
-    if type(opMessageLocation) != str:
-        raise TypeError("Operating Packet Location must be specified as a string!")
+        if type(opMessageLocation) != str:
+            raise TypeError("Operating Packet Location must be specified as a string!")
 
-    if not opMessageLocation.endswith("/"):
-        opMessageLocation = opMessageLocation + "/"
+        if not opMessageLocation.endswith("/"):
+            opMessageLocation = opMessageLocation + "/"
 
-    opPack = glob(opMessageLocation+packetName)
+        opPack = glob(opMessageLocation+packetName)
 
-    if len(opPack) == 0:
-        # There were no opperation packages found.
-        return "No Op Pack"
-    elif len(opPack) > 1:
-        # There were too many operation packages found.
-        raise ValueError("There were too many operation packages found. They should be removed/renamed after being worked with.")
+        if len(opPack) == 0:
+            # There were no opperation packages found.
+            return "No Op Pack"
+        elif len(opPack) > 1:
+            # There were too many operation packages found.
+            raise ValueError("There were too many operation packages found. They should be removed/renamed after being worked with.")
 
-    opFile = open(opPack,"rb")
-    opData = opFile.read()
-    opFile.close()
+        opFile = open(opPack,"rb")
+        opData = opFile.read()
+        opFile.close()
 
-    if len(opData) == 0:
-        opMessage = "Op Pack Empty"
-    elif "Send Picture" in opData
-        opMessage = "picReq"
-    elif "powerOff" in opData
-        opMessage = "reboot"
-    else:
-        opMessage = "messageError"
+        if len(opData) == 0:
+            opMessage = "Op Pack Empty"
+        elif "Send Picture" in opData
+            opMessage = "picReq"
+        elif "powerOff" in opData
+            opMessage = "reboot"
+        else:
+            opMessage = "messageError"
 
-    # Delete or rename the file so the next opPack can be interpreted
-    if delete == 1:
-        # Delete the file after it's parsed.
-        os.remove(opPack)
-    else:
-        # Rename the file after it's parsed.
-        date = datetime.now().strftime("%y-%m-%d-%H-%M")
-        newName = opMessageLocation + packetName + date
-        os.rename(opPack,newName)
+        # Delete or rename the file so the next opPack can be interpreted
+        if delete == 1:
+            # Delete the file after it's parsed.
+            os.remove(opPack)
+        else:
+            # Rename the file after it's parsed.
+            date = datetime.now().strftime("%y-%m-%d-%H-%M")
+            newName = opMessageLocation + packetName + date
+            os.rename(opPack,newName)
 
 
 
-    # Return one of the following strings
-    # picture request = picReq
-    return opMessage
+        # Return one of the following strings
+        # picture request = picReq
+        return opMessage
 
-def unpack(GRCOutput, filePrefix, operatingFolder):
-    # Written by William
-    # Accepts GNU Radio (Rx) Output File
-    # Saves split unpacked files into operating Folder
-    # Does not save duplicate files
-    # Performs light error detection. Won't save files with corrupt names/lengths
-    # Returns list of the received files.
+    def unpack(GRCOutput, filePrefix, operatingFolder):
+        # Written by William
+        # Accepts GNU Radio (Rx) Output File
+        # Saves split unpacked files into operating Folder
+        # Does not save duplicate files
+        # Performs light error detection. Won't save files with corrupt names/lengths
+        # Returns list of the received files.
 
-    if not operatingFolder.endswith("/"):
-        operatingFolder = operatingFolder + "/"
+        if not operatingFolder.endswith("/"):
+            operatingFolder = operatingFolder + "/"
 
-    # Load the output of the GRC File in as a string
-    rxFile =open(GRCOutput,'rb')
-    rx=rxFile.read()
-    rxFile.close()
+        # Load the output of the GRC File in as a string
+        rxFile =open(GRCOutput,'rb')
+        rx=rxFile.read()
+        rxFile.close()
 
-    pktStarts = strSearch(rx,filePrefix) # Find the indexes where all of the packets start
+        pktStarts = strSearch(rx,filePrefix) # Find the indexes where all of the packets start
 
-    # Check all indexes and make sure they reference packet names that can exist
-    pkts = dict() # Create a dictionary that holds packet data
-    for i in pktStarts:
-        try:  # Using try in case we accidently go past the length of the string.
-            name = rx[i:i+7]
-            legalName = 1 # All names innocent until proven guilty.
-            if name == filePrefix+str(9999): # We don't want to save synchronization packets, so they are illegal.
-                legalName = 0
-            try:
-                nameNumber = name[len(filePrefix):len(filePrefix)+5] # Get the number suffix from the name
-                int(nameNumber) # Attempt to convert the number to a integer. If it's not, this will raise an error.
-            except ValueError: # Catch error if nameNumber isn't a number
-                legalName = 0
+        # Check all indexes and make sure they reference packet names that can exist
+        pkts = dict() # Create a dictionary that holds packet data
+        for i in pktStarts:
+            try:  # Using try in case we accidently go past the length of the string.
+                name = rx[i:i+7]
+                legalName = 1 # All names innocent until proven guilty.
+                if name == filePrefix+str(9999): # We don't want to save synchronization packets, so they are illegal.
+                    legalName = 0
+                try:
+                    nameNumber = name[len(filePrefix):len(filePrefix)+5] # Get the number suffix from the name
+                    int(nameNumber) # Attempt to convert the number to a integer. If it's not, this will raise an error.
+                except ValueError: # Catch error if nameNumber isn't a number
+                    legalName = 0
 
-            # Determine the length of the packet
-            length = 0
-            for j in range(4):
-                temp = ord(rx[ind + 7 + j])
-                temp = temp * int(np.power(10, (3 - j)))
-                length += temp
+                # Determine the length of the packet
+                length = 0
+                for j in range(4):
+                    temp = ord(rx[ind + 7 + j])
+                    temp = temp * int(np.power(10, (3 - j)))
+                    length += temp
 
-            # Validate that hte length is legit
-            legalLength = 1 # All lengths are innocent until proven guitly
-            if length >= 9999:
-                legalLength = 0
+                # Validate that hte length is legit
+                legalLength = 1 # All lengths are innocent until proven guitly
+                if length >= 9999:
+                    legalLength = 0
 
-            if legalName == 1 and legalLength == 1:
-                data = rx[i+11:i+11+length]
-                pkts[name] = data
-            else:
-                pktStarts.remove(i) # Don't save the packets that weren't legal
-        except IndexError:
-            pktStarts.remove(i) # If pkt i created an index error, remove it from the list, it's incomplete.
+                if legalName == 1 and legalLength == 1:
+                    data = rx[i+11:i+11+length]
+                    pkts[name] = data
+                else:
+                    pktStarts.remove(i) # Don't save the packets that weren't legal
+            except IndexError:
+                pktStarts.remove(i) # If pkt i created an index error, remove it from the list, it's incomplete.
 
-    # Save data from the pkts dictionary
-    keys = pkts.keys()
-    for i in keys:
-        fileSegment = open(operatingFolder+i,'wb')
-        fileSegment.write(pkts[i])
-        fileSegment.close()
+        # Save data from the pkts dictionary
+        keys = pkts.keys()
+        for i in keys:
+            fileSegment = open(operatingFolder+i,'wb')
+            fileSegment.write(pkts[i])
+            fileSegment.close()
 
-    return keys
+        return keys
 
-def strSearch(mainString,searchPhrase):
-    # Written by William
-    # Used in unpack to search through strings to find the index of the start of substrings
-    indexs = [m.start() for m in re.finditer(searchPhrase,mainString)]
-    return indexs
+    def strSearch(mainString,searchPhrase):
+        # Written by William
+        # Used in unpack to search through strings to find the index of the start of substrings
+        indexs = [m.start() for m in re.finditer(searchPhrase,mainString)]
+        return indexs
 
 
 #FUNCTIONS for CHECKSUM------------------------------------------------------------------------------------------
-def CREATE_CHECKSUM(pyld,len_header,pktname):
-    #Written by Erick Terrazas
-    HEADER_size = 2
-    checksum_field = bytearray(2)
-    checksum = 0
-    ##Typeerror checks
-    if (type(pyld) != type('pyld')):
-        raise TypeError('Data must be in string type')
-    if (type(len_header) != type(bytearray(1)):
-        raise TypeError('Data must be in bytearray type')
-    if (type(pktname) != type('pktname')):
-        raise TypeError('filename must be in string type')
+    def CREATE_CHECKSUM(pyld,len_header,filename):
+        #Written by Erick Terrazas
+        HEADER_size = 2
+        checksum_field = bytearray(2)
+        checksum = 0
+        ##Typeerror checks
+        if (type(pyld) != type('pyld')):
+            raise TypeError('Data must be in string type')
+        if (type(len_header) != type(bytearray(1))):
+            raise TypeError('Data must be in bytearray type')
+        if (type(filename) != type('filename')):
+            raise TypeError('filename must be in string type')
 
-    ### First we have to add binary data of filename into checksum
-    for str_byte in filename:
-        num_val = ord(str_byte)     #Take each byte and just add it to data
-        checksum += num_val         #add numerical representation
-        #checksum = (checksum >> 16) + (checksum & 0xFFFF)
+        ### First we have to add binary data of filename into checksum
+        for str_byte in filename:
+            num_val = ord(str_byte)     #Take each byte and just add it to data
+            checksum += num_val         #add numerical representation
+            #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
-    ### next add header field binary data
-    for thing in len_header:
-        checksum += thing
-        #checksum = (checksum >> 16) + (checksum & 0xFFFF)
+        ### next add header field binary data
+        for thing in len_header:
+            checksum += thing
+            #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
-    ###NOw we add pyld binary data
-    for stick in pyld:
-        checksum += ord(stick)
-        #checksum = (checksum >> 16) + (checksum & 0xFFFF)
+        ###NOw we add pyld binary data
+        for stick in pyld:
+            checksum += ord(stick)
+            #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
-    ###Last step, add data to empty bytearray
-    checksum_field[0] = (checksum >> 8) & 0xFF  #Most signifigant byte of binary data array
-    checksum_field[1] = (checksum) & 0xFF       #Least signigiant byte of binary data array
-    
-    return checksum_field                       #FUNCTION RETURNS BYTE ARRAY OF CHECKSUM FOR 'pktname'
+        ###Last step, add data to empty bytearray
+        checksum_field[0] = (checksum >> 8) & 0xFF
+        checksum_field[1] = (checksum) & 0xFF
+        return checksum_field
+
 
 
 # END CHECKSUM DEFINTIONS-------------------------------------------------------------------------------------
+
+    def secondary_header(self):
+    #Made by Erick Terrazas
+
+    ##objective is to add 2ndary header ontop of payload
+    # Note: This must be done BEFORE packetize is used, otherwise header is not in correct format
+    #we have self.fileList to open pkts and add pktname,length,and checksum
+
+    #1. for loop to get filename, open file, and then do whats needed to add the three header fields
+    new_payload= ''  #'New_payload is where we will order the header data with the payload data, will eventually write
+                    #  Into the file we started with
+    for list_tgt in self.fileList:
+        g = open('INPUT/'+list_tgt,'rb')   #GO to input folder and pick up pkt file
+        payload = g.read()          #we gather up the data present in pyld
+        g.close()                   #close file (for now)
+
+        ###Lets calculate the length of payload and format it as necessary
+        lengthfieldsize = 4                     #predetermined numerical length of length field in bytes
+        pyld_len = len(payload)
+        fieldarray = list(str(pyld_len))        #create empty list as long as numerical value of pyld_len
+        len_field = np.pad(fieldarray,[lenfieldsize-len(fieldarray),0],"constant",constant_values=0)
+        tmp = 0*lengthfieldsize
+
+        for index in range (len(lenfield)):
+            if (lenfield[index] == ''):
+                lenfield[index] = int(lenfield[index])
+            tmp[i] = int(lenfield[index])
+        pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
+
+        ###LEts create checksum by calling CREATE_CHECKSUM definition
+        pkt_checksum_header = CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = self.fileList[index])
+
+        ###Now lets call file again and write new data on top of pyld
+        n = open('INPUT'+list_tgt,'wb')
+        new_payload = list_tgt + pkt_length_header + pkt_checksum_header + payload
+        n.write(new_payload)
+        n.close()
+
