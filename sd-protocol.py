@@ -1,6 +1,6 @@
 # Handles the protocol aspects of the project
 # Includes major functions such as prototransfer and protopack
-
+import numpy as np
 from glob import glob
 from datetime import datetime
 import os
@@ -108,6 +108,23 @@ class fileTrack():
         # Made by Erick
         # Packages control messages into a format ready for GNU Radio
         # Probably just needs to pass the message to packetize
+
+        #op_data is sent seperately from picture data so we don't need a secondary header
+        #other than the pktname. Just add primary header and return data to be inserted into
+        # TX_INPUT
+        #
+        if type(message) != type('string'):
+            raise TypeError('"message" parameter must be a string.')
+
+
+        op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
+        final_package = op_pktname + message + message + message    #Add pktname to pyld
+
+        final_package = self.packetize(data=final_package)  #add primary header to data
+
+        return final_package #return data, ready for op_data message Tx!
+
+
 
     def packetize(self, data):
         # Made by William
