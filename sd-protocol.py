@@ -301,7 +301,7 @@ def strSearch(mainString,searchPhrase):
 
 
 #FUNCTIONS for CHECKSUM------------------------------------------------------------------------------------------
-def CREATE_CHECKSUM(pyld,len_header,filename):
+def CREATE_CHECKSUM(pyld,len_header,pktname):
     #Written by Erick Terrazas
     HEADER_size = 2
     checksum_field = bytearray(2)
@@ -309,9 +309,9 @@ def CREATE_CHECKSUM(pyld,len_header,filename):
     ##Typeerror checks
     if (type(pyld) != type('pyld')):
         raise TypeError('Data must be in string type')
-    if (type(len_header) != type(bytearray(1))):
+    if (type(len_header) != type('lenheader')):
         raise TypeError('Data must be in bytearray type')
-    if (type(filename) != type('filename')):
+    if (type(pktname) != type('pktname')):
         raise TypeError('filename must be in string type')
 
     ### First we have to add binary data of filename into checksum
@@ -322,7 +322,7 @@ def CREATE_CHECKSUM(pyld,len_header,filename):
 
     ### next add header field binary data
     for thing in len_header:
-        checksum += thing
+        checksum += ord(thing)
         #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
     ###NOw we add pyld binary data
@@ -331,58 +331,10 @@ def CREATE_CHECKSUM(pyld,len_header,filename):
         #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
     ###Last step, add data to empty bytearray
-    checksum_field[0] = (checksum >> 8) & 0xFF
-    checksum_field[1] = (checksum) & 0xFF
-    return checksum_field
+    checksum_field[0] = (checksum >> 8) & 0xFF  #Most signifigant byte of binary data array
+    checksum_field[1] = (checksum) & 0xFF       #Least signigiant byte of binary data array
+    
+    return checksum_field                       #FUNCTION RETURNS BYTE ARRAY OF CHECKSUM FOR 'pktname'
 
 
-def CONDUCT_CHECKSUM(checksum_field,filename):
-    #written by Erick T
-    ##check types of input parameters
-    if (type(data) != type('pyld')):
-        raise TypeError('Data must be in string type')
-    if (type(checksum_field) != type(bytearray(1)) ):
-        raise TypeError('Data must be in bytearray type')
-    if (type(filename) != type('i')):
-        raise TypeError('Data must be in string type')
-
-    data = '' #will be used to check bytes for bit consistency
-    file = open(filename,'rb')
-    ### first we open file and begin reading what we need
-    data += file.read(7) #Read pkt filename
-    data += file.read(4) #read  length
-
-    checksum = file.read(2)     #store checksum (in str type format)
-
-    data += file.read()         #read payload
-    file.close()
-
-    sum = 0
-    array = bytearray(2)
-
-
-
-    for str_byte in data:
-        sum += ord(data)
-
-    array[0] = (sum >> 8) & 0xFF
-    array[1] = sum & 0xFF
-
-    tmp = open('tmp','wb' ) #Temp files allow recreation of caulcated sum in terms of binary data
-    tmp.write(array)
-    tmp.close()
-
-    tmp1 = open('tmp','rb')
-    compare_field = tmp1.read()
-    tmp1.close()
-    #OPEN TMP AND COMPARE ITS STR WITH STR OF CHECKSUM_FIELD
-
-    if (checksum_field != compare_field):
-        print('Packet is corrupt!')
-        return (1)
-
-    else:
-        print('Packet is uncorrupted! Nice work!')
-        return(0)
-    return
 # END CHECKSUM DEFINTIONS-------------------------------------------------------------------------------------
