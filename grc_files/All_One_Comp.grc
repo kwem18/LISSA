@@ -159,7 +159,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>20e3</value>
+      <value>10e3</value>
     </param>
   </block>
   <block>
@@ -259,7 +259,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(24, 228)</value>
+      <value>(24, 356)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -322,7 +322,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(176, 228)</value>
+      <value>(176, 356)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -385,7 +385,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(296, 228)</value>
+      <value>(296, 356)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -483,7 +483,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1.630e9</value>
+      <value>915e6</value>
     </param>
   </block>
   <block>
@@ -580,7 +580,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -616,6 +616,65 @@
     </param>
   </block>
   <block>
+    <key>analog_random_source_x</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(56, 180)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>analog_random_source_x_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>max</key>
+      <value>255</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>min</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>num_samps</key>
+      <value>1000</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>True</value>
+    </param>
+  </block>
+  <block>
     <key>analog_sig_source_x</key>
     <param>
       <key>amp</key>
@@ -635,7 +694,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>freq</key>
@@ -694,7 +753,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -796,7 +855,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>file</key>
@@ -902,7 +961,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -953,7 +1012,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1008,7 +1067,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1256,7 +1315,7 @@
     </param>
     <param>
       <key>if_gain0</key>
-      <value>30</value>
+      <value>0</value>
     </param>
     <param>
       <key>gain0</key>
@@ -2144,7 +2203,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3543,7 +3602,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3686,7 +3745,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 292)</value>
+      <value>(1072, 380)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3694,7 +3753,7 @@
     </param>
     <param>
       <key>_rotation</key>
-      <value>180</value>
+      <value>0</value>
     </param>
     <param>
       <key>id</key>
@@ -3710,7 +3769,7 @@
     </param>
     <param>
       <key>name</key>
-      <value>"Before"</value>
+      <value>"Receive"</value>
     </param>
     <param>
       <key>plotconst</key>
@@ -3785,7 +3844,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 180)</value>
+      <value>(1072, 228)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3809,7 +3868,7 @@
     </param>
     <param>
       <key>name</key>
-      <value>"After"</value>
+      <value>"Transmit"</value>
     </param>
     <param>
       <key>plotconst</key>
@@ -3979,6 +4038,12 @@
     <sink_key>1</sink_key>
   </connection>
   <connection>
+    <source_block_id>analog_random_source_x_0</source_block_id>
+    <sink_block_id>digital_psk_mod_0_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>analog_sig_source_x_0</source_block_id>
     <sink_block_id>blocks_multiply_xx_0</sink_block_id>
     <source_key>0</source_key>
@@ -4009,6 +4074,12 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>blocks_multiply_const_vxx_0_0_0</source_block_id>
+    <sink_block_id>qtgui_sink_x_1</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>blocks_multiply_xx_0</source_block_id>
     <sink_block_id>blocks_add_xx_0</sink_block_id>
     <source_key>0</source_key>
@@ -4033,12 +4104,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>digital_costas_loop_cc_0</source_block_id>
-    <sink_block_id>qtgui_sink_x_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>digital_psk_demod_0_0_0</source_block_id>
     <sink_block_id>Senior_Design_Preamble_Detection_py_bb_0</sink_block_id>
     <source_key>0</source_key>
@@ -4057,6 +4122,12 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>osmosdr_source_0</source_block_id>
+    <sink_block_id>qtgui_sink_x_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>rational_resampler_xxx_0</source_block_id>
     <sink_block_id>blocks_multiply_const_vxx_0_0_0</sink_block_id>
     <source_key>0</source_key>
@@ -4065,12 +4136,6 @@
   <connection>
     <source_block_id>rational_resampler_xxx_0_0</source_block_id>
     <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>rational_resampler_xxx_0_0</source_block_id>
-    <sink_block_id>qtgui_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
