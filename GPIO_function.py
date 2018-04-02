@@ -36,6 +36,7 @@ class GPIO_function:
         self.clk_freq = float(25)       #Frequency of clock signal definition executeThread
         self.sync = int(sync)           #sync determines whether or not we want sequential ginsl in ADAFRUIT PIN C2
         self.off = int(1)
+        self.clock.setDaemon(False)     #redundant line to make sure that thread ends when main function ends
 
     def ENABLE_FEM(self,switch=0):
         initial = time.clock()                  #Start clocking in time displacement
@@ -50,7 +51,8 @@ class GPIO_function:
             print('\nFEM ACTIVATING...')
             self.ft232h.output(9, GPIO.HIGH)    # TURN ENABLE SIGNAL ON(DC)
             time.sleep(0.4)                     #system sleep to prevent GPIO board data overload
-            self.runclock()    #call runclock definition that starts thread (produces clock signal at pin C2(ADAFRUIT) )
+            if self.sync == 1:
+                self.runclock()    #call runclock definition that starts thread (produces clock signal at pin C2(ADAFRUIT) )
             print("Time elapsed: " + str(self.final - self.initial) )
         else:
             raise ValueError('MUST INPUT integer 1 (ON) or integer 0 (OFF)')
