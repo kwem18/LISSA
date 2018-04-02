@@ -1,6 +1,6 @@
 # Handles the protocol aspects of the project
 # Includes major functions such as prototransfer and protopack
-
+import numpy as np
 from glob import glob
 from datetime import datetime
 import os
@@ -25,7 +25,7 @@ class fileTrack():
 
         # Check that the file path ends with a forward dash
         if operatingDir.endswith("/"):
-            self.operatingDir = operatingDir
+            self.operatingDir = operatingDir            #Declare dynamic dir to self.operatingDir if slash is in place
         else:
             self.operatingDir = operatingDir + "/"
 
@@ -100,14 +100,62 @@ class fileTrack():
         return filesRemaining
 
     def filePack(self):
-        # Made by Erick
+        # Made by Erick Terrazas
+        #NO RETURN OBJECT ONLY CREAT TX_INPUT.BIN
         # Packages the file list into a file ready for GNU Radio
-        self.fileList
+        l_fieldsize = 4 #size of length header (secondary)
+        final_data = ''
+        for pktname in self.fileList:
+            tgt = open(self.operatingDir+pktname,'rb')  #Open file from dynamic dir
+            payload = tgt.read()                            #Read the payload data
+
+            ###Start creating 2ndary header-------------------------------
+            #Length Header
+            pyld_len = len(payload)
+            fieldarray = list(str(pyld_len))        #create empty list as long as numerical value of pyld_len
+            lenfield = np.pad(fieldarray,[l_fieldsize-len(fieldarray),0],"constant",constant_values=0)
+            tmp = [0]*l_fieldsize
+            for index in range(len(lenfield)):
+                if lenfield[index] == '':
+                    lenfield[index] = int(lenfield[index])
+                tmp[i] = int(lenfield[index])
+            pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
+
+            ### Create checksum by calling CREATE_CHECKSUM definition-------
+            pkt_checksum_header = self.CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = pktname)
+            packed_pkt = pktname + pkt_length_header + pkt_checksum_header + payload
+
+            ### add primary header
+            packed_pkt = self.packetize(packed_pkt)     #pkt now has been packe with 'LISSA' protocol, ready for TX!
+            final_data += packed_pkt                   #final data holds data to be inserted to GRC_tx
+
+        fileinput = open('TX_INPUT.bin','wb')       #binary input file created and written
+        fileinput.write(final_data)
+        fileinput.close()
+        return
+
 
     def opDataPack(self,message):
         # Made by Erick
         # Packages control messages into a format ready for GNU Radio
         # Probably just needs to pass the message to packetize
+
+        #op_data is sent seperately from picture data so we don't need a secondary header
+        #other than the pktname. Just add primary header and return data to be inserted into
+        # TX_INPUT
+
+        if type(message) != type('string'):
+            raise TypeError('"message" parameter must be a string.')
+
+
+        op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
+        final_package = op_pktname + message + message + message    #Add pktname to pyld
+
+        final_package = self.packetize(data=final_package)  #add primary header to data
+
+        return final_package #return data, ready for op_data message Tx!
+
+
 
     def packetize(self, data):
         # Made by William
@@ -267,7 +315,7 @@ class fileTrack():
                 # Determine the length of the packet
                 length = 0
                 for j in range(4):
-                    temp = ord(rx[ind + 7 + j])
+                    temp = ord(rx[i + 7 + j])
                     temp = temp * int(np.power(10, (3 - j)))
                     length += temp
 
@@ -301,33 +349,38 @@ class fileTrack():
 
 
 #FUNCTIONS for CHECKSUM------------------------------------------------------------------------------------------
-    def CREATE_CHECKSUM(pyld,len_header,filename):
+    def CREATE_CHECKSUM(pyld,len_header,pktname):  #NOTE: len_header can be either str or bytearray!
         #Written by Erick Terrazas
         HEADER_size = 2
         checksum_field = bytearray(2)
         checksum = 0
         ##Typeerror checks
         if (type(pyld) != type('pyld')):
-            raise TypeError('Data must be in string type')
-        if (type(len_header) != type(bytearray(1))):
-            raise TypeError('Data must be in bytearray type')
-        if (type(filename) != type('filename')):
+            raise TypeError('Data must be string type')
+        if ( type(len_header) != type(bytearray(1)) | type(len_header) != type('i') ):
+            raise TypeError('Data must be bytearray type or a string')
+        if (type(pktname) != type('filename')):
             raise TypeError('filename must be in string type')
 
         ### First we have to add binary data of filename into checksum
-        for str_byte in filename:
+        for str_byte in pktname:
             num_val = ord(str_byte)     #Take each byte and just add it to data
             checksum += num_val         #add numerical representation
             #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
         ### next add header field binary data
-        for thing in len_header:
-            checksum += thing
+        if type(len_header) == type('str'):
+            for alpha in len_header:
+                checksum += ord(alpha)
+        elif type(len_header) == type(bytearray(1)):
+            len_header = str(len_header)        #byte array converted to str (equivalent to converting to binary data)
+            for beta in len_header:             #beta represents a byte of len_header
+                checksum += ord(beta)           #take integer equivalent, add to checksum
             #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
         ###NOw we add pyld binary data
-        for stick in pyld:
-            checksum += ord(stick)
+        for pyld_byte in pyld:
+            checksum += ord(pyld_byte)
             #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
         ###Last step, add data to empty bytearray
@@ -337,40 +390,6 @@ class fileTrack():
 
 
 
-# END CHECKSUM DEFINTIONS-------------------------------------------------------------------------------------
 
-    def secondary_header(self,filename):
-    #Made by Erick Terrazas
-
-    ##objective is to add 2ndary header ontop of payload
-    # Note: This must be done BEFORE packetize is used, otherwise header is not in correct format
-    #we have self.fileList to open pkts and add pktname,length,and checksum
-
-    #1. FOR loop to get filename, open file, and then do whats needed to add the three header fields
-        g = open('INPUT/'+filename,'rb')   #GO to input folder and pick up pkt file
-        payload = g.read()          #we gather up the data present in pyld
-        g.close()                   #close file (for now)
-
-        ###Lets calculate the length of payload and format it as necessary
-        l_fieldsize = 4                     #predetermined numerical length of length field in bytes
-        pyld_len = len(payload)
-        fieldarray = list(str(pyld_len))        #create empty list as long as numerical value of pyld_len
-        len_field = np.pad(fieldarray,[l_fieldsize-len(fieldarray),0],"constant",constant_values=0)
-        tmp = [0]*l_fieldsize
-
-        for index in range(len(lenfield)):
-            if lenfield[index] == '':
-                lenfield[index] = int(lenfield[index])
-            tmp[i] = int(lenfield[index])
-        pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
-
-        ###LEts create checksum by calling CREATE_CHECKSUM definition
-        pkt_checksum_header = CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = list_tgt)
-
-        ###Now lets add 2ndary header in oorrect format and add on top of original paylod
-
-        new_payload = filename + pkt_length_header + pkt_checksum_header + payload
-
-        return new_payload
 
 
