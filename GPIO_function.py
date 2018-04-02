@@ -82,20 +82,18 @@ class GPIO_function:
         time.sleep(0.2)
         self.ft232h.output(9,GPIO.LOW)      #Drive Enable port (PIN C1) LOW
         time.sleep(0.2)
-
+        print('Shutdown conducted.')
 
     def executeThread(self):        #EXECUTES CLOCK SIGNAL SOFTWARE LOGIC USING GPIO PIN C2
         print('ENABLE_FEM(switch=1) called.\nCLOCK (PIN C2) START')
-        while True:
-            if (self.off == 0):
-                print('CLOCK STOPPED DUE TO SHUTDOWN')
-                return
-            else:
-                #print "---Thread is High at {}".format(time.strftime("%H:%M:%S",time.gmtime()))
-                half_period = (float(1)/self.clk_freq)/float(2)
-                self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
-                time.sleep(half_period)
-                #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
-                self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
-                time.sleep(half_period)
+        while self.off != 0:
+            #print "---Thread is High at {}".format(time.strftime("%H:%M:%S",time.gmtime()))
+            half_period = (float(1)/self.clk_freq)/float(2)
+            self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
+            time.sleep(half_period)
+            #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
+            self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
+            time.sleep(half_period)
+
+        print('Thread is dead')
 
