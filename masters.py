@@ -10,6 +10,16 @@ from datetime import datetime
 from shutil import copyfile
 import os
 
+def testGRCs():
+    try:
+        gr_rx = grc_rx()
+        gr_tx = grc_tx(IF_Gain=power)
+    except TypeError as e:
+        if str(e) == "__init__() takes exactly 1 argument (2 given)":
+            prepGRC()
+        else:
+            print("!!! GRC files failed test and were not able to be automatically corrected !!!")
+            raise
 
 
 def remote(FEMlogic,power):
@@ -84,7 +94,7 @@ def remote(FEMlogic,power):
         print("All done!")
 
 
-def host(FEMlogic,power):
+def host(FEMlogic,power,userinput = 1):
     # Master program for server device
     print("/////////////////////////////// ")
     print("||||| Host Master Program ||||| ")
@@ -95,7 +105,10 @@ def host(FEMlogic,power):
     gr_tx = grc_tx(IF_Gain = power)
     FEMControl = GPIO_function(sync = FEMlogic)
 
-    raw_input("Send Picture Request? (remote node must be running.) [enter]")
+    if userinput == 1:
+        raw_input("Send Picture Request? (remote node must be running.) [enter]")
+    else:
+        print("Requesting picture.")
 
     # Create operating directory
     operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
@@ -170,6 +183,7 @@ def prepGRC():
 
 
 if __name__ == "__main__":
+    sequential = raw_input("Is this device using the sequential logic FEM control board? ([Y]es/[N]o) ")
     if 'y' in sequential or 'Y' in sequential:
         logic = 0
     elif 'n' in sequential or 'N' in sequential:
@@ -183,21 +197,12 @@ if __name__ == "__main__":
 
     remote_or_host = raw_input("Is this controlling the remote or host device? (Remote/Host): ")
 
-    try:
-        if "R" in remote_or_host or "r" in remote_or_host:
-            remote(logic,power)
-        elif "H" in remote_or_host or "h" in remote_or_host:
-            host(logic,power)
-        else:
-            raise ValueError("Input must be specified as [H]ost or [R]emote.")
-    except TypeError as e:
-        if str(e) == "__init__() takes exactly 1 argument (2 given)":
-            prepGRC()
-            if "R" in remote_or_host or "r" in remote_or_host:
-                remote(logic, power)
-            elif "H" in remote_or_host or "h" in remote_or_host:
-                host(logic, power)
-            else:
-                raise ValueError("Input must be specified as [H]ost or [R]emote.")
-        else:
-            raise
+    # Make sure the GRC's can be called.
+    testGRCs()
+
+    if "R" in remote_or_host or "r" in remote_or_host:
+        remote(logic,power)
+    elif "H" in remote_or_host or "h" in remote_or_host:
+        host(logic,power)
+    else:
+        raise ValueError("Input must be specified as [H]ost or [R]emote.")
