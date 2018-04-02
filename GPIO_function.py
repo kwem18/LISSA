@@ -16,7 +16,7 @@
 import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.FT232H as FT232H
 import time # For time
-import threading
+import threading            #For clock signal implementation
 
 # END MODULES----------------------------------------------------------------------
 
@@ -32,7 +32,9 @@ class GPIO_function:
         self.ft232h.setup(10,GPIO.OUT)  # PIN 10 maps to BOARD PORT C2   CLOCK SIGNAL
         self.initial = int(0)           #to be used for time displacement of cmd
         self.final = int(0)             #to be used for time displacement of cmd
-        self.clock = threading.Thread(target=self.executeThread)      #Thread exclusively for CLOCK (C2)
+        self.clock = threading.Thread(target=self.run_clock)      #Thread exclusively for CLOCK (C2)
+        self.paused = False
+        self.pause_cond = threading.Condition(threading.Lock())
         self.clk_freq = float(25)       #Frequency of clock signal definition executeThread
         self.sync = int(sync)           #sync determines whether or not we want sequential ginsl in ADAFRUIT PIN C2
         self.off = int(1)
@@ -52,7 +54,7 @@ class GPIO_function:
             self.ft232h.output(9, GPIO.HIGH)    # TURN ENABLE SIGNAL ON(DC)
             time.sleep(0.4)                     #system sleep to prevent GPIO board data overload
             if self.sync == 1:
-                self.runclock()    #call runclock definition that starts thread (produces clock signal at pin C2(ADAFRUIT) )
+                self.start_clock()    #call runclock definition that starts thread (produces clock signal at pin C2(ADAFRUIT) )
             print("Time elapsed: " + str(self.final - self.initial) )
         else:
             raise ValueError('MUST INPUT integer 1 (ON) or integer 0 (OFF)')
@@ -71,8 +73,45 @@ class GPIO_function:
         time.sleep(0.2)
         return
 
-    def runclock(self):     #runs clock thread intilzaed as self.clock (in __init__)
+    def start_clock(self):     #runs clock thread intilzaed as self.clock (in __init__)
         self.clock.start()  #Run thread self.clock and therfore call def executeThread
+
+    def resume_clock(self):
+        self.paused = False
+        self.pause_cond.notify()
+        self.pause_cond.release()
+
+    def pause_clock(self):
+        self.paused = True
+        self.pause_cond.acquire()
+
+
+    def run_clock(self):        #EXECUTES CLOCK SIGNAL SOFTWARE LOGIC USING GPIO PIN C2
+        half_period = (float(1) / self.clk_freq) / float(2)
+        while self.off != 0:
+            with self.pause_cond:
+                while self.paused:
+                    self.pause_cond.wait()
+
+
+                self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
+                time.sleep(half_period)
+                #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
+                self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
+                time.sleep(half_period)
+
+
+        # print('ENABLE_FEM(switch=1) called.\nCLOCK (PIN C2) START')
+        # while self.off != 0:
+        #     #print "---Thread is High at {}".format(time.strftime("%H:%M:%S",time.gmtime()))
+        #     half_period = (float(1)/self.clk_freq)/float(2)
+        #     self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
+        #     time.sleep(half_period)
+        #     #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
+        #     self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
+        #     time.sleep(half_period)
+        #
+        # print('Thread is dead')
 
     def shutdown(self):
         if(self.sync==1):
@@ -85,17 +124,3 @@ class GPIO_function:
         self.ft232h.output(9,GPIO.LOW)      #Drive Enable port (PIN C1) LOW
         time.sleep(0.2)
         print('Shutdown conducted.')
-
-    def executeThread(self):        #EXECUTES CLOCK SIGNAL SOFTWARE LOGIC USING GPIO PIN C2
-        print('ENABLE_FEM(switch=1) called.\nCLOCK (PIN C2) START')
-        while self.off != 0:
-            #print "---Thread is High at {}".format(time.strftime("%H:%M:%S",time.gmtime()))
-            half_period = (float(1)/self.clk_freq)/float(2)
-            self.ft232h.output(10,GPIO.HIGH)        #Drive PIN C2 HIGH
-            time.sleep(half_period)
-            #print "---Thread is Low at {}".format(time.strftime("%H:%M:%S", time.gmtime()))
-            self.ft232h.output(10,GPIO.LOW)         #Drive PIN C2 LOW
-            time.sleep(half_period)
-
-        print('Thread is dead')
-
