@@ -92,6 +92,8 @@ def remote(FEMlogic,power):
         gr_tx.wait()
 
         print("All done!")
+        ###SHUTDONW BELOW WAS ADDED BY ERICK
+        FEMControl.shutdown()
 
 
 def host(FEMlogic,power,userinput = 1):
@@ -162,6 +164,9 @@ def host(FEMlogic,power,userinput = 1):
     fileManip.comb(operatingDir+"pkt",pictureName)
 
     print("File Received, All done.")
+
+    ###ADDED BY ERICK T
+    FEMControl.shutdown()
 
 
 def prepGRC():
