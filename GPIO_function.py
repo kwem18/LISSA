@@ -53,8 +53,10 @@ class GPIO_function:
             print('\nFEM ACTIVATING...')
             self.ft232h.output(9, GPIO.HIGH)    # TURN ENABLE SIGNAL ON(DC)
             time.sleep(0.4)                     #system sleep to prevent GPIO board data overload
-            if self.sync == 1:
+            if self.sync == 1 & self.paused == False:        #FOr runnning lock for the first time
                 self.start_clock()    #call runclock definition that starts thread (produces clock signal at pin C2(ADAFRUIT) )
+            if self.sync == 1 & self.paused == True:     #FOr starting the clock again if paused
+                self.resume_clock()
             print("Time elapsed: " + str(self.final - self.initial) )
         else:
             raise ValueError('MUST INPUT integer 1 (ON) or integer 0 (OFF)')
@@ -115,7 +117,7 @@ class GPIO_function:
 
     def shutdown(self):
         if(self.sync==1):
-            self.off = int(0)                  #STOP clock(PIN C2) using self.off
+            self.off = 0                  #STOP clock(PIN C2) using self.off
 
         self.ft232h.output(10,GPIO.LOW)
         time.sleep(0.2)
