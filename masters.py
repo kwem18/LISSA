@@ -38,7 +38,7 @@ def remote(FEMlogic,power):
     operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
     os.mkdir(operatingDir)
 
-    FEMControl.ENABLE_FEM(switch=1)
+    FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
 
     print("Listening for received packets.")
     FEMControl.RX_FEM()
