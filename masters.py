@@ -1,4 +1,4 @@
-import sys
+import sys, time
 sys.path.insert(0,'grc_files') # add grc files folder to scope of python file
 import grc_rx, grc_tx
 import fileInterfaces
@@ -32,11 +32,11 @@ def remote(FEMlogic,power):
     print("Listening for picture request.")
     gr_rx = grc_rx()
     gr_tx = grc_tx(IF_Gain=power)
-    FEMControl = GPIO_function(sync=FEMlogic)
+    FEMControl = GPIO_function(sync=FEMlogic)       #Initialize GPIO_function class with input parpameter of sync
 
     # Create operating directory
     operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
-    os.mkdir(operatingDir)
+    os.mkdir(operatingDir)                          #create a folder for this instance of using remote function
 
     FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
 
@@ -66,15 +66,24 @@ def remote(FEMlogic,power):
             fileManager.filePack()
 
             # Transmit the packet file
+            FEMControl.ENABLE_FEM(switch=0)
+            time.sleep(0.4)
             FEMControl.TX_FEM()
+            time.sleep(0.4)
+            FEMControl.ENABLE_FEM(switch=1)
+            time.sleep(0.4)
             gr_tx.start()
             gr_tx.wait()
 
             # Wait for the ackpack
+            FEMControl.ENABLE_FEM(switch=0)
+            time.sleep(0.4)
             FEMControl.RX_FEM()
+            time.sleep(0.4)
+            FEMControl.ENABLE_FEM(switch=1)
+            time.sleep(0.4)
             gr_rx.start()
-            fileInterfaces.watchFile("Output", changeHold=5,
-                                     interval=500)  # stays in function till file change detected.
+            fileInterfaces.watchFile("Output", changeHold=5,interval=500)  # stays in function till file change detected.
             gr_rx.stop()  # Stop the receive path after the Output file wasn't changed for 2500ms
 
             # Unpack the ackPack
@@ -87,13 +96,20 @@ def remote(FEMlogic,power):
 
         fileManager.opDataPack("Tx Done")
 
+        FEMControl.ENABLE_FEM(switch=0)
+        time.sleep(0.4)
         FEMControl.TX_FEM()
+        time.sleep(0.4)
+        FEMControl.ENABLE_FEM(switch=1)
+        time.sleep(0.4)
         gr_tx.start()
         gr_tx.wait()
 
         print("All done!")
-        ###SHUTDONW BELOW WAS ADDED BY ERICK
-        FEMControl.shutdown()
+        ###SHUTDOWN BELOW WAS ADDED BY ERICK
+        FEMControl.pause_clock()        #stop sequential logic
+        time.sleep(0.4)     #wait 0.4 seconds
+        FEMControl.shutdown()       #final shutdown of FEM module
 
 
 def host(FEMlogic,power,userinput = 1):

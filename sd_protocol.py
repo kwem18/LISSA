@@ -304,7 +304,7 @@ class fileTrack():
         for i in pktStarts:
             try:  # Using try in case we accidently go past the length of the string.
                 name = rx[i:i+7]
-                legalName = 1 # All names innocent until proven guilty.
+                legalName = 1           # All names innocent until proven guilty.
                 if name == filePrefix+str(9999): # We don't want to save synchronization packets, so they are illegal.
                     legalName = 0
                 try:
