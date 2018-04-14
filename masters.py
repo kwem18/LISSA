@@ -22,7 +22,7 @@ def testGRCs():
             raise
 
 
-def remote(FEMlogic,power):
+def remote(FEMlogic,power,debug=0):
     # Master program for remote device
     print("/////////////////////////////// ")
     print("|||| Remote Master Program |||| ")
@@ -42,18 +42,23 @@ def remote(FEMlogic,power):
 
     print("Listening for received packets.")
     FEMControl.RX_FEM()
+    if debug>=1:
+        print("gr_rx turning on")
     gr_rx.start()  # start the receive path
     fileInterfaces.watchFile("Output", changeHold=5, interval=500) # stays in function till file change detected.
     gr_rx.stop()  # Stop the receive path after the Output file wasn't changed for 2500ms
-
+    if debug>=1:
+        print("grc_rx turning off")
     # Interpret the received command
     sd_protocol.unpack("Output",filePrefix="op_data",operatingFolder=operatingDir)
     opMesssage = sd_protocol.opDataInterp(operatingDir)
 
     if opMesssage == "picReq":
         # take a picture
-        picLocation = Camera_control.takepicture()
-
+        #picLocation = Camera_control.takepicture()
+        picLocation = "sat_pic.JPG"
+        if debug>=2:
+            print("SPLITTING PCITURE FROM DIRECTORY")
         #split the picture
         fileManip.cut(operatingDir+"pkt",picLocation,1000)
 
@@ -73,11 +78,18 @@ def remote(FEMlogic,power):
             # Wait for the ackpack
             FEMControl.RX_FEM()
             gr_rx.start()
+            if debug>=1:
+                print("gr_rx is starting")
+            if debug>=0:
+                print("Starting watchFile definition")
             fileInterfaces.watchFile("Output", changeHold=5,
                                      interval=500)  # stays in function till file change detected.
             gr_rx.stop()  # Stop the receive path after the Output file wasn't changed for 2500ms
-
+            if debug>=1:
+                print("gr_rx has stopped")
             # Unpack the ackPack
+            if debug>=0:
+                print("unpacking data using 'unpack' definition")
             sd_protocol.unpack("Output","op_data",operatingDir)
 
             # Interpret the ackPack
@@ -88,6 +100,8 @@ def remote(FEMlogic,power):
         fileManager.opDataPack("Tx Done")
 
         FEMControl.TX_FEM()
+        if debug>=0:
+            print("gr_tx is sending operational data of 'Tx'_done")
         gr_tx.start()
         gr_tx.wait()
 
