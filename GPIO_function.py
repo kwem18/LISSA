@@ -44,10 +44,14 @@ class GPIO_function:
         initial = time.clock()                  #Start clocking in time displacement
         if (switch == 0):                       # We want to turn off DC voltage
             print('\nFEM SHUTTING DOWN...')
-            self.ft232h.output(9,GPIO.LOW)      # TURN ENABLE  GPIO OFF(DC)
+
+            self.ft232h.output(9,GPIO.LOW)      # TURN ENABLE GPIO OFF(DC)
             time.sleep(0.4)                     # Cautionary pause to avoid data overload of GPIO board
             #self.ft232h.output(8, GPIO.LOW)    # Drive Control signal to low voltage by default
             self.final = time.clock()           # time final timestamp
+            if self.sync == 1 & self.paused == False:
+                print("Clock still running!")
+
             print('Time elapsed:' + str((self.final - self.initial)) )
         elif (switch == 1):                     # Turn on ENABLE
             print('\nFEM ACTIVATING...')

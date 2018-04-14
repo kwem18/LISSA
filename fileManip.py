@@ -28,12 +28,18 @@ def cut(original,prefix,fSize,debug=0):
 		raise TypeError("Segmented size should be an integer of bytes.")
 	if fSize > originalSize/2.:
 		raise ValueError('Segmented size larger than half original file size.')
-	
+
+
 	#Determine the number of files that will be created
 	filesCreated = str(int((float(originalSize)/float(fSize))+0.5))
 
+	if len(filesCreated) > 4:
+		raise ValueError('Function does not support more than 9,999 split files.')
+	
+
 	bytes = ["-b",str(fSize)]
-	suffix = ["-d","-a",str(len(filesCreated))]
+	suffix = ["-d","-a","4"]
+
 	command = ["split"]+suffix+bytes+[original,prefix]
 	sysCall(command)
 
