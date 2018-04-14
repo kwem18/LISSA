@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0,'grc_files') # add grc files folder to scope of python file
-import grc_rx, grc_tx
+import GRC_Rx, GRC_Tx
 import fileInterfaces
 import fileManip
 import GPIO_function
@@ -175,16 +175,13 @@ def prepGRC():
     # This will need to be called after every time the GRC files are run not through python
 
     # Remove the wrong top block python files.
-    os.remove("GRC_Files/GRC_Rx.py")
-    os.remove("GRC_Files/GRC_Tx.py")
+    os.remove("grc_files/GRC_Rx.py")
+    os.remove("grc_files/GRC_Tx.py")
 
     # Copy in the saved, callable, python files.
-    copyfile("GRC_Rx_Callable.py", "GRC_Files")
-    copyfile("GRC_Tx_Callable.py","GRC_Files")
+    copyfile("GRC_Rx_Callable.py", "grc_files/GRC_Rx.py")
+    copyfile("GRC_Tx_Callable.py","grc_files/GRC_Tx.py")
 
-    # Rename the python files
-    os.remove("GRC_Files/GRC_Rx.py")
-    os.remove("GRC_Files/GRC_Tx.py")
 
 
 if __name__ == "__main__":
