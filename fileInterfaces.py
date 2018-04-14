@@ -9,15 +9,13 @@ def watchFile(fileName,change="size",interval=50,changeHold = -1):
     # ChangeHold set to -1 will result in watchFile returning 1 as soon as a change is detected.
     # ChangeHold set to 3 will result in watchFile returnig 1 after three checks have been made where no change was detected AFTER an initial change was detected.
 
-    # Change unit of interval from milliseconds to seconds for sleep
-    interval = interval/1000.
-
     supportChanges = ["size","modTime","accessTime"]
 
     if not change in supportChanges:
         raise ValueError("Supported Changes that can be watched are size, modTime, accessTime.")
 
     if type(interval) != int:
+        print(str(interval)+str(type(interval)))
         raise TypeError("Polling interval must be specified as an integer. The unit is milliseconds.")
     if interval <= 0:
         raise ValueError("Polling interval must be a positive non-zero integer. The unit is milliseconds.")
@@ -27,6 +25,9 @@ def watchFile(fileName,change="size",interval=50,changeHold = -1):
 
     if not os.path.isfile(fileName):
         raise IOError("fileName fails to point to a file that exists.")
+
+    # Change unit of interval from milliseconds to seconds for sleep
+    interval = interval/1000.
 
     # Get the initial value
     lastValue = dynamicStat(fileName,change)
@@ -65,3 +66,9 @@ def dynamicStat(fileName,change):
     elif change == "accessTime":
         result = os.stat(fileName).st_atime
     return result
+
+if __name__ == "__main__":
+    fileName = "testing.txt"
+    print("Startint to watch "+fileName)
+    watchFile(fileName,change="size",interval=1000,changeHold = 3)
+    print("Change Detected.")
