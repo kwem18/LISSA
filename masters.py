@@ -22,7 +22,7 @@ def testGRCs():
             print("!!! GRC files failed test and were not able to be automatically corrected !!!")
             raise
 
-def remote(FEMlogic,power,debug = 0):
+def remote(FEMlogic,power,debug = 0,fem = 1):
     # Master program for remote device
     print("/////////////////////////////// ")
     print("|||| Remote Master Program |||| ")
@@ -32,16 +32,18 @@ def remote(FEMlogic,power,debug = 0):
     print("Listening for picture request.")
     gr_rx = GRC_Rx()
     gr_tx = GRC_Tx(IF_Gain=power)
-    FEMControl = GPIO_function(sync=FEMlogic)
+    if fem==0:
+        FEMControl = GPIO_function(sync=FEMlogic)
 
     # Create operating directory
     operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
     os.mkdir(operatingDir)
-
-    FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
+    if fem==0:
+        FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
 
     print("Listening for received packets.")
-    FEMControl.RX_FEM()
+    if fem==0:
+        FEMControl.RX_FEM()
     if debug>=1:
         print("gr_rx turning on")
     gr_rx.start()  # start the receive path
@@ -72,12 +74,14 @@ def remote(FEMlogic,power,debug = 0):
             fileManager.filePack()
 
             # Transmit the packet file
-            FEMControl.TX_FEM()
+            if fem==0:
+                FEMControl.TX_FEM()
             gr_tx.start()
             gr_tx.wait()
 
             # Wait for the ackpack
-            FEMControl.RX_FEM()
+            if fem==0:
+                FEMControl.RX_FEM()
             gr_rx.start()
             if debug>=1:
                 print("gr_rx is starting")
@@ -99,8 +103,8 @@ def remote(FEMlogic,power,debug = 0):
         print("Picture successfully transmitted.")
 
         fileManager.opDataPack("Tx Done")
-
-        FEMControl.TX_FEM()
+        if fem==0:
+            FEMControl.TX_FEM()
         if debug>=0:
             print("gr_tx is sending operational data of 'Tx'_done")
         gr_tx.start()
@@ -108,10 +112,11 @@ def remote(FEMlogic,power,debug = 0):
 
         print("All done!")
         ###SHUTDONW BELOW WAS ADDED BY ERICK
-        FEMControl.shutdown()
+        if fem==0:
+            FEMControl.shutdown()
 
 
-def host(FEMlogic,power,userinput = 1,debug = 0):
+def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
     # Master program for server device
     print("/////////////////////////////// ")
     print("||||| Host Master Program ||||| ")
@@ -120,7 +125,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0):
     #Initiate GNU Radio Files
     gr_rx = GRC_Rx()
     gr_tx = GRC_Tx(IF_Gain = power)
-    FEMControl = GPIO_function(sync = FEMlogic)
+    if fem==0:
+        FEMControl = GPIO_function(sync = FEMlogic)
     if debug >= 1:
         print("Initilized GNU Radio Programs.")
 
@@ -151,7 +157,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0):
     # Run GRC TX to send the opPack
     if debug >= 0:
         print("Transmitting Picture Request")
-    FEMControl.TX_FEM()
+    if fem==0:
+        FEMControl.TX_FEM()
     gr_tx.start() # start the transmit path
     gr_tx.wait() # wait for the transmit path to finish
     if debug >= 1:
@@ -162,7 +169,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0):
         # Run GRC Rx to listen for the picture to come back
         if debug >= 1:
             print("Waiting to receive data packages")
-        FEMControl.RX_FEM()
+        if fem==0:
+            FEMControl.RX_FEM()
         gr_rx.start()  # start the receive path
         fileInterfaces.watchFile("Output",changeHold=5,interval=500)
         gr_rx.stop() # Stop the receive path after the Output file wasn't changed for 2500ms
@@ -188,14 +196,16 @@ def host(FEMlogic,power,userinput = 1,debug = 0):
         fileManager.opDataPack(receivedFiles)
         if debug >= 0:
             print("Transmitting ack pack")
-        FEMControl.TX_FEM()
+        if fem==0:
+            FEMControl.TX_FEM()
         gr_tx.start()
         gr_tx.wait()
 
     if debug >=0:
         print("All Packets Received!")
-    FEMControl.ENABLE_FEM(switch=0)
-    FEMControl.shutdown()
+    if fem==0:
+        FEMControl.ENABLE_FEM(switch=0)
+        FEMControl.shutdown()
 
     # Combine the packets into a pictures.
     pictureName = "picture"+datetime.now().strftime("%m-%d-%H:%M")
@@ -204,7 +214,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0):
     print("File Received, All done.")
 
     ###ADDED BY ERICK T
-    FEMControl.shutdown()
+    if fem==0:
+        FEMControl.shutdown()
 
 
 def prepGRC():
@@ -240,13 +251,19 @@ if __name__ == "__main__":
     remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
 
     debugLevel = raw_input("What level of debug would you like to run? -1 to 5? ")
-
+    FEM_choice = raw_input("Do you wish to use the FEM module? [Y]es or [N]o.")
+    if 'y' in FEM_choice or 'Y' in FEM_choice:
+        FEM_sw = 0      #zero means yes we want FEM activating
+    elif 'n' in FEM_choice or 'N' in FEM_choice:
+        FEM_sw = 1
+    else:
+        raise ValueError("Input must be specified as [Y]es or [N]o.")
     # Make sure the GRC's can be called.
     testGRCs()
 
     if "R" in remote_or_host or "r" in remote_or_host:
-        remote(logic,power,debug = debugLevel)
+        remote(logic,power,debug = debugLevel,fem = FEM_sw)
     elif "H" in remote_or_host or "h" in remote_or_host:
-        host(logic,power, debug=debugLevel)
+        host(logic,power, debug=debugLevel,fem = FEM_sw)
     else:
         raise ValueError("Input must be specified as [H]ost or [R]emote.")
