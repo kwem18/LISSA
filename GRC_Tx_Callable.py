@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Grc Tx
-# Generated: Sat Apr 14 15:58:24 2018
+# Generated: Sat Apr 14 17:21:53 2018
 ##################################################
 
 from gnuradio import blocks
@@ -20,7 +20,7 @@ import time
 
 class GRC_Tx(gr.top_block):
 
-    def __init__(self,power):
+    def __init__(self,IF_Gain=3):
         gr.top_block.__init__(self, "Grc Tx")
 
         ##################################################
@@ -31,7 +31,7 @@ class GRC_Tx(gr.top_block):
         self.sps = sps = int(BB_samp_rate/baud_rate)
         self.rf_freq = rf_freq = 0.915e9
         self.rf_bw = rf_bw = 5e6
-        self.ifgain = ifgain = power
+        self.ifgain = ifgain = IF_Gain
         self.const_points = const_points = 2
         self.channel_bw = channel_bw = 25e3
         self.RF_samp_rate = RF_samp_rate = 100000
@@ -39,7 +39,7 @@ class GRC_Tx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.osmosdr_sink_0 = osmosdr.sink( args="numchan=" + str(1) + " " + 'soapy=0,driver=lime,serial=0009061C02CF232D' )
+        self.osmosdr_sink_0 = osmosdr.sink( args="numchan=" + str(1) + " " + 'soapy=0,driver=lime' )
         self.osmosdr_sink_0.set_sample_rate(RF_samp_rate)
         self.osmosdr_sink_0.set_center_freq(rf_freq, 0)
         self.osmosdr_sink_0.set_freq_corr(0, 0)

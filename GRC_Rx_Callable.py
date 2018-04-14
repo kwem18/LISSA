@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Grc Rx
-# Generated: Sat Apr 14 15:58:18 2018
+# Generated: Sat Apr 14 17:21:29 2018
 ##################################################
 
 from gnuradio import blocks
@@ -40,7 +40,7 @@ class GRC_Rx(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + 'soapy=0,driver=lime,serial=0009070105C62E09' )
+        self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + 'soapy=0,driver=lime' )
         self.osmosdr_source_0.set_sample_rate(RF_samp_rate)
         self.osmosdr_source_0.set_center_freq(rf_freq, 0)
         self.osmosdr_source_0.set_freq_corr(0, 0)

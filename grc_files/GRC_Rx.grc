@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.10'?>
 <flow_graph>
   <timestamp>Sun Feb 25 11:58:42 2018</timestamp>
   <block>
@@ -2104,7 +2104,7 @@
     </param>
     <param>
       <key>args</key>
-      <value>soapy=0,driver=lime,serial=0009061C02CF232D</value>
+      <value>soapy=0,driver=lime</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -3503,7 +3503,7 @@
     </param>
     <param>
       <key>args</key>
-      <value>soapy=0,driver=lime,serial=0009070105C62E09</value>
+      <value>soapy=0,driver=lime</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -4356,10 +4356,6 @@
     <param>
       <key>srate</key>
       <value>BB_samp_rate</value>
-    </param>
-    <param>
-      <key>stemplot</key>
-      <value>False</value>
     </param>
     <param>
       <key>tr_chan</key>

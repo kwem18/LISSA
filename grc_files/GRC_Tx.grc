@@ -2104,7 +2104,7 @@
     </param>
     <param>
       <key>args</key>
-      <value>soapy=0,driver=lime,serial=0009061C02CF232D</value>
+      <value>soapy=0,driver=lime</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -3503,7 +3503,7 @@
     </param>
     <param>
       <key>args</key>
-      <value>soapy=0,driver=lime,serial=0009070105C62E09</value>
+      <value>soapy=0,driver=lime</value>
     </param>
     <param>
       <key>_enabled</key>

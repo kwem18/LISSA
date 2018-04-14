@@ -1,9 +1,10 @@
 import sys
 sys.path.insert(0,'grc_files') # add grc files folder to scope of python file
-import GRC_Rx, GRC_Tx
+from GRC_Rx import *
+from GRC_Tx import *
+from GPIO_function import *
 import fileInterfaces
 import fileManip
-import GPIO_function
 import sd_protocol
 
 from datetime import datetime
@@ -20,7 +21,6 @@ def testGRCs():
         else:
             print("!!! GRC files failed test and were not able to be automatically corrected !!!")
             raise
-
 
 def remote(FEMlogic,power,debug = 0):
     # Master program for remote device
@@ -232,12 +232,14 @@ if __name__ == "__main__":
         raise ValueError("Input must be specified as [Y]es or [N]o.")
 
     power = raw_input("What IF Gain value should the SDR transmit at? (integer): ")
-    if type(power) != int:
+    try:
+        power = int(power)
+    except ValueError:
         raise TypeError("The Gain value must be specified as an integer.")
 
-    remote_or_host = raw_input("Is this controlling the remote or host device? (Remote/Host): ")
+    remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
 
-    debugLevel = raw_input("What level of debug would you like to run? -1 to 5")
+    debugLevel = raw_input("What level of debug would you like to run? -1 to 5? ")
 
     # Make sure the GRC's can be called.
     testGRCs()
