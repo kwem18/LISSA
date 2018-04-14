@@ -119,7 +119,7 @@ class fileTrack():
             for index in range(len(lenfield)):
                 if lenfield[index] == '':
                     lenfield[index] = int(lenfield[index])
-                tmp[i] = int(lenfield[index])
+                tmp[index] = int(lenfield[index])
             pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
 
             ### Create checksum by calling CREATE_CHECKSUM definition-------
@@ -281,7 +281,7 @@ class fileTrack():
         # picture request = picReq
         return opMessage
 
-    def unpack(GRCOutput, filePrefix, operatingFolder):
+    def unpack(self,GRCOutput, filePrefix, operatingFolder):
         # Written by William
         # Accepts GNU Radio (Rx) Output File
         # Saves split unpacked files into operating Folder
@@ -297,7 +297,7 @@ class fileTrack():
         rx=rxFile.read()
         rxFile.close()
 
-        pktStarts = strSearch(rx,filePrefix)  # Find the indexes where all of the packets start
+        pktStarts = self.strSearch(rx,filePrefix)  # Find the indexes where all of the packets start
 
         # Check all indexes and make sure they reference packet names that can exist
         pkts = dict() # Create a dictionary that holds packet data

@@ -133,6 +133,7 @@ def host(FEMlogic,power,userinput = 1):
     os.mkdir(operatingDir)
 
     # Create file manager object
+    # sd_protocol class is defined here as filemanager
     fileManager = sd_protocol.fileTrack(operatingDir,preamble="26530",filePrefix='pkt')
 
     # Package picture request for transmission
@@ -173,6 +174,7 @@ def host(FEMlogic,power,userinput = 1):
 
     print("All Packets Received!")
     FEMControl.ENABLE_FEM(switch=0)
+
     FEMControl.shutdown()
 
     # Combine the packets into a pictures.
