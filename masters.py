@@ -59,6 +59,7 @@ def remote(FEMlogic,power,debug=0):
         picLocation = "sat_pic.JPG"
         if debug>=2:
             print("SPLITTING PCITURE FROM DIRECTORY")
+
         #split the picture
         fileManip.cut(operatingDir+"pkt",picLocation,1000)
 
