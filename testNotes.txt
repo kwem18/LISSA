@@ -1,0 +1,3 @@
+Note, this folder is not linked to a git repo. The files in here are modified specificly for testing.
+Merge with a git repo carefully.
+The GRC python file was modified from the original generated one.
