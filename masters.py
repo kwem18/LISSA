@@ -3,7 +3,7 @@ sys.path.insert(0,'grc_files') # add grc files folder to scope of python file
 import grc_rx, grc_tx
 import fileInterfaces
 import fileManip
-import GPIO_function
+from GPIO_function import GPIO_function
 import sd_protocol
 
 from datetime import datetime
@@ -121,7 +121,7 @@ def host(FEMlogic,power,userinput = 1):
     #Initiate GNU Radio Files
     gr_rx = grc_rx()
     gr_tx = grc_tx(IF_Gain = power)
-    FEMControl = GPIO_function(sync = FEMlogic)
+    FEMControl = GPIO_function(sync=FEMlogic)
 
     if userinput == 1:
         raw_input("Send Picture Request? (remote node must be running.) [enter]")
