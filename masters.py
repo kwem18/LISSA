@@ -15,12 +15,13 @@ def testGRCs():
     try:
         gr_rx = GRC_Rx()
         gr_tx = GRC_Tx(IF_Gain=3)
-    except TypeError as e:
-        if str(e) == "__init__() got an unexpected keyword argument 'IF_Gain'":
-            prepGRC()
-        else:
-            print("!!! GRC files failed test and were not able to be automatically corrected !!!")
-            raise
+    except TypeError:
+        gr_rx = None
+        gr_tx = None
+        prepGRC()
+        gr_rx = GRC_Rx()
+        gr_tx = GRC_Tx(IF_Gain=3)
+
 
 def remote(FEMlogic,power,debug = 0,fem = 1):
     # Master program for remote device
@@ -252,23 +253,42 @@ if __name__ == "__main__":
             raise ValueError("Input must be specified as [Y]es or [N]o.")
     else:
         logic = 1
+if False:
+    if __name__ == "__main__":
+        sequential = raw_input("Is this device using the sequential logic FEM control board? ([Y]es/[N]o) ")
+        if 'y' in sequential or 'Y' in sequential:
+            logic = 0
+        elif 'n' in sequential or 'N' in sequential:
+            logic = 1
+        else:
+            raise ValueError("Input must be specified as [Y]es or [N]o.")
 
-    power = raw_input("What IF Gain value should the SDR transmit at? (integer): ")
-    try:
-        power = int(power)
-    except ValueError:
-        raise TypeError("The Gain value must be specified as an integer.")
+        power = raw_input("What IF Gain value should the SDR transmit at? (integer): ")
+        try:
+            power = int(power)
+        except ValueError:
+            raise TypeError("The Gain value must be specified as an integer.")
 
-    remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
+        remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
 
-    debugLevel = raw_input("What level of debug would you like to run? -1 to 5? ")
+        debugLevel = raw_input("What level of debug would you like to run? -1 to 5? ")
 
     # Make sure the GRC's can be called.
+        testGRCs()
+
+        if "R" in remote_or_host or "r" in remote_or_host:
+            remote(logic,power,debug = debugLevel,fem = FEM_sw)
+        elif "H" in remote_or_host or "h" in remote_or_host:
+            host(logic,power, debug=debugLevel,fem = FEM_sw)
+        else:
+            raise ValueError("Input must be specified as [H]ost or [R]emote.")
+
+if __name__ == "__main__":
+    logic = 0
+    power = 10
+    debugLevel = 5
+    FEM_sw = 1
+
     testGRCs()
 
-    if "R" in remote_or_host or "r" in remote_or_host:
-        remote(logic,power,debug = debugLevel,fem = FEM_sw)
-    elif "H" in remote_or_host or "h" in remote_or_host:
-        host(logic,power, debug=debugLevel,fem = FEM_sw)
-    else:
-        raise ValueError("Input must be specified as [H]ost or [R]emote.")
+    host(logic,power, debug=debugLevel,fem = FEM_sw)
