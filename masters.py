@@ -12,8 +12,8 @@ import os
 
 def testGRCs():
     try:
-        gr_rx = grc_rx()
-        gr_tx = grc_tx(IF_Gain=power)
+        gr_rx = GRC_Rx()
+        gr_tx = GRC_Tx(IF_Gain=3)
     except TypeError as e:
         if str(e) == "__init__() takes exactly 1 argument (2 given)":
             prepGRC()
@@ -22,7 +22,7 @@ def testGRCs():
             raise
 
 
-def remote(FEMlogic,power,debug=0):
+def remote(FEMlogic,power,debug = 0):
     # Master program for remote device
     print("/////////////////////////////// ")
     print("|||| Remote Master Program |||| ")
@@ -30,8 +30,8 @@ def remote(FEMlogic,power,debug=0):
 
     # Initialize hardware/GRC controls
     print("Listening for picture request.")
-    gr_rx = grc_rx()
-    gr_tx = grc_tx(IF_Gain=power)
+    gr_rx = GRC_Rx()
+    gr_tx = GRC_Tx(IF_Gain=power)
     FEMControl = GPIO_function(sync=FEMlogic)
 
     # Create operating directory
@@ -111,66 +111,89 @@ def remote(FEMlogic,power,debug=0):
         FEMControl.shutdown()
 
 
-def host(FEMlogic,power,userinput = 1):
+def host(FEMlogic,power,userinput = 1,debug = 0):
     # Master program for server device
     print("/////////////////////////////// ")
     print("||||| Host Master Program ||||| ")
     print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ ')
 
     #Initiate GNU Radio Files
-    gr_rx = grc_rx()
-    gr_tx = grc_tx(IF_Gain = power)
+    gr_rx = GRC_Rx()
+    gr_tx = GRC_Tx(IF_Gain = power)
     FEMControl = GPIO_function(sync = FEMlogic)
+    if debug >= 1:
+        print("Initilized GNU Radio Programs.")
 
     if userinput == 1:
         raw_input("Send Picture Request? (remote node must be running.) [enter]")
-    else:
+
+    if debug >= 0:
         print("Requesting picture.")
 
     # Create operating directory
     operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
     os.mkdir(operatingDir)
+    if debug >= 2:
+        print("Created operating dirrectory as : "+str(operatingDir))
 
     # Create file manager object
     fileManager = sd_protocol.fileTrack(operatingDir,preamble="26530",filePrefix='pkt')
+    if debug >= 2:
+        print("Initilized fileTrack.")
 
+    if debug >= 2:
+        print("Getting ready to send picture request.")
     # Package picture request for transmission
     fileManager.opDataPack("Send Picture")
 
     FEMControl.ENABLE_FEM(switch=1)
 
     # Run GRC TX to send the opPack
-    print("Transmitting Picture Request")
+    if debug >= 0:
+        print("Transmitting Picture Request")
     FEMControl.TX_FEM()
     gr_tx.start() # start the transmit path
     gr_tx.wait() # wait for the transmit path to finish
+    if debug >= 1:
+        print("Finished transmitting picture request")
 
     receivedFiles = []
     while receivedFiles != "All Received":
         # Run GRC Rx to listen for the picture to come back
-        print("Waiting to receive data packages")
+        if debug >= 1:
+            print("Waiting to receive data packages")
         FEMControl.RX_FEM()
         gr_rx.start()  # start the receive path
         fileInterfaces.watchFile("Output",changeHold=5,interval=500)
         gr_rx.stop() # Stop the receive path after the Output file wasn't changed for 2500ms
+        if debug >= 1:
+            print("Finished receiving file.")
 
         # Unpack the received files
+        if debug >=1:
+            print("Unpacking files.")
         receivedFiles = sd_protocol.unpack("Output","pkt",operatingDir)# unpack received files to operating dir
         if receivedFiles == []: # No files received with pkt header
+            if debug >= 2:
+                print("Didn't find any data packets. Checking for Op Data.")
             # Try to unpack op_data instead
             receivedFiles = sd_protocol.unpack("Output", "op_data", operatingDir)  # unpack received files to operating dir
             if receivedFiles != []:
                 # An op_data packet was received
+                if debug >= 1:
+                    print("Found opdata!")
                 receivedFiles = sd_protocol.opDataInterp(operatingDir) # Interpret op_data
 
         # Reply with ack pack of received files
         fileManager.opDataPack(receivedFiles)
-        print("Transmitting ack pack")
+        if debug >= 0:
+            print("Transmitting ack pack")
         FEMControl.TX_FEM()
         gr_tx.start()
         gr_tx.wait()
 
-    print("All Packets Received!")
+    if debug >=0:
+        print("All Packets Received!")
     FEMControl.ENABLE_FEM(switch=0)
     FEMControl.shutdown()
 
@@ -214,12 +237,14 @@ if __name__ == "__main__":
 
     remote_or_host = raw_input("Is this controlling the remote or host device? (Remote/Host): ")
 
+    debugLevel = raw_input("What level of debug would you like to run? -1 to 5")
+
     # Make sure the GRC's can be called.
     testGRCs()
 
     if "R" in remote_or_host or "r" in remote_or_host:
-        remote(logic,power)
+        remote(logic,power,debug = debugLevel)
     elif "H" in remote_or_host or "h" in remote_or_host:
-        host(logic,power)
+        host(logic,power, debug=debugLevel)
     else:
         raise ValueError("Input must be specified as [H]ost or [R]emote.")
