@@ -38,7 +38,7 @@ class fileTrack():
         #print("Discovered files: " + str(files))
         self.fileList = []
         for i in range(len(files)):
-            fileName = files[i].split("/")[1]
+            fileName = files[i].split("/")[2]
             self.fileList.append(fileName)
         print("FILE LIST:" + str(self.fileList))
 

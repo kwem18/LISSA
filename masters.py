@@ -79,7 +79,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             # Transmit the packet file
             if fem==0:
                 FEMControl.TX_FEM()
-            print("+=+=+=+=+=+=+=\ngr_transmit starting\n+=+=+=+=+=+=+=")
+            print("+=+=+=+=+=+=+=\ngr_transmit starting\n+=+=+=+=+=+=+=\n")
             #gr_transmit(power) #commented out until we actually use sdr
             print("+=+=+=+=+=+=+=\ngr_transmit finished\n+=+=+=+=+=+=+=")
             # Wait for the ackpack
