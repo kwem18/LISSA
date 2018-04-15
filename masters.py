@@ -236,6 +236,26 @@ def prepGRC():
     copyfile("GRC_Tx_Callable.py","grc_files/GRC_Tx.py")
 
 
+
+if __name__ == "__main__":
+    FEM_choice = raw_input("Do you wish to use the FEM module? [Y]es or [N]o.")
+    if 'y' in FEM_choice or 'Y' in FEM_choice:
+        FEM_sw = 0  # zero means yes we want FEM activating
+    elif 'n' in FEM_choice or 'N' in FEM_choice:
+        FEM_sw = 1
+    else:
+        raise ValueError("Input must be specified as [Y]es or [N]o.")
+
+    if FEM_sw == 0:
+        sequential = raw_input("Is this device using the sequential logic FEM control board? ([Y]es/[N]o) ")
+        if 'y' in sequential or 'Y' in sequential:
+            logic = 0
+        elif 'n' in sequential or 'N' in sequential:
+            logic = 1
+        else:
+            raise ValueError("Input must be specified as [Y]es or [N]o.")
+    else:
+        logic = 1
 if False:
     if __name__ == "__main__":
         sequential = raw_input("Is this device using the sequential logic FEM control board? ([Y]es/[N]o) ")
@@ -255,14 +275,8 @@ if False:
         remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
 
         debugLevel = raw_input("What level of debug would you like to run? -1 to 5? ")
-        FEM_choice = raw_input("Do you wish to use the FEM module? [Y]es or [N]o.")
-        if 'y' in FEM_choice or 'Y' in FEM_choice:
-            FEM_sw = 0      #zero means yes we want FEM activating
-        elif 'n' in FEM_choice or 'N' in FEM_choice:
-            FEM_sw = 1
-        else:
-            raise ValueError("Input must be specified as [Y]es or [N]o.")
-        # Make sure the GRC's can be called.
+
+    # Make sure the GRC's can be called.
         testGRCs()
 
         if "R" in remote_or_host or "r" in remote_or_host:
