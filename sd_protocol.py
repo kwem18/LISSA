@@ -49,7 +49,7 @@ class fileTrack():
         # Expecting packet acks to come in as a comment seperated string.
         # EG: pkt0001,pkt0002,pkt0004,pkt0006 means pkt0001, pkt0002, pkt0004 and pkt0006 were received correctly
 
-        ackName = "ackPack"
+        ackName = "op_data"
 
         if type(ackLocation) != str:
             raise TypeError("Ack Packet Location must be specified as a string!")

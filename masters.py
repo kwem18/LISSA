@@ -105,7 +105,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             FEMControl.TX_FEM()
         if debug>=0:
             print("gr_tx is sending operational data of 'Tx'_done")
-        gr_transmit(power)
+        #gr_transmit(power)
 
         print("All done!")
         ###SHUTDONW BELOW WAS ADDED BY ERICK
