@@ -66,6 +66,8 @@ class fileTrack():
             # There were too amny ack files
             raise ValueError("Too many ackfiles! They should have been deleted after being parsed.")
 
+        ackPack = ackPack[0]
+
         opFile = open(ackPack, "rb")
         opData = opFile.read()
         opFile.close()
@@ -76,11 +78,10 @@ class fileTrack():
         # acks is now a list of the successfully received files.
         # Confirm that received acks are actual file names inside fileList. (if they aren't just throw them away)
         for i in acks:
-            if not i in self.fileList:
+            if i in self.fileList:
+                self.fileList = filter(lambda a: a != i,self.fileList)# if the ack received was in the file list, remove it from the file list so it isnt' sent again
+            else:
                 acks.remove(i) # If the ack wasn't part of the file list, it must have been corrupted, we'll just drop it and resend the file.
-
-        # need to subtract acks from the fileList, so they aren't sent again.
-        self.fileList =list(set(self.fileList)^set(acks)) # Removes all acks from the file list.
 
         # Delete or remove the old ackPack.
         if delete == 1:
