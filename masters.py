@@ -40,7 +40,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
         FEMControl = GPIO_function(sync=FEMlogic)
 
     # Create operating directory
-    operatingDir = "pkt"+datetime.now().strftime("%m-%d-%H:%M")+"/"
+    operatingDir = "OperatingFile/"+"pkt"+datetime.now().strftime("%m-%d-%H:%M")+"/"
     os.mkdir(operatingDir)
     if fem==0:
         FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
@@ -129,7 +129,7 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
         print("Requesting picture.")
 
     # Create operating directory
-    operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
+    operatingDir = "OperatingFile/"+"pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
     os.mkdir(operatingDir)
     if debug >= 2:
         print("Created operating dirrectory as : "+str(operatingDir))
