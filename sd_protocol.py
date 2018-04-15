@@ -119,7 +119,7 @@ class fileTrack():
             tmp = [0]*l_fieldsize
             for index in range(len(lenfield)):
                 if lenfield[index] == '':
-                    lenfield[index] = int(lenfield[index])
+                    lenfield[index] = 0 # Changed from equal to int(lenfield[index])
                 tmp[index] = int(lenfield[index])
             pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
 
@@ -164,9 +164,10 @@ class fileTrack():
         fieldarray = list(str(pyld_len))  # create empty list
         lenfield = np.pad(fieldarray, [l_fieldsize - len(fieldarray), 0], "constant", constant_values=0)
         tmp = [0] * l_fieldsize
+        print("lenfield: "+str(lenfield))
         for index in range(len(lenfield)):
             if lenfield[index] == '':
-                lenfield[index] = int(lenfield[index])
+                lenfield[index] = 0 # Changed from equal to int(lenfield[index])
             tmp[index] = int(lenfield[index])
         pkt_length_header = bytearray(tmp)  # This variable will be added with pyld(by
         final_package = op_pktname + pkt_length_header + payload    #Add pktname to pyld
