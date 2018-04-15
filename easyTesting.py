@@ -1,6 +1,6 @@
 from shutil import copyfile
 
-while true:
+while True:
     action = raw_input("1:Reset Output, 2:Pic Request, 3:Ack Response   ")
 
     if action == "1":

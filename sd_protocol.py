@@ -32,7 +32,7 @@ class fileTrack():
 
         self.preamble = int(preamble)
         self.filePrefix = filePrefix
-        print("----------\nsoperatingdir:" + str(self.operatingDir) +"\n--------")
+        print("----------\noperatingdir:" + str(self.operatingDir) +"\n--------")
         # create the file list here.
         files = glob(self.operatingDir+self.filePrefix)
         print("Discovered files: " + str(files))

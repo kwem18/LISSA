@@ -40,7 +40,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
         FEMControl = GPIO_function(sync=FEMlogic)
 
     # Create operating directory
-    operatingDir = "pkts"+datetime.now().strftime("%m-%d-%H:%M")+"/"
+    operatingDir = "pkt"+datetime.now().strftime("%m-%d-%H:%M")+"/"
     os.mkdir(operatingDir)
     if fem==0:
         FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
@@ -277,4 +277,4 @@ if __name__ == "__main__":
 
     testGRCs()
 
-    host(logic,power, debug=debugLevel,fem = FEM_sw)
+    remote(logic,power, debug=debugLevel,fem = FEM_sw)
