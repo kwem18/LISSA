@@ -299,6 +299,8 @@ def opDataInterp(opMessageLocation,delete=0):
         opMessage = "reboot"
     elif "All Received" in opData:
         opMessage = "All Received"
+    elif "Nothing Received" in opData:
+        opMessage = "Nothing Received"
     else:
         opMessage = "messageError"
 
