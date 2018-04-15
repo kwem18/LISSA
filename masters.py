@@ -35,7 +35,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ ')
     print("\n")
     # Initialize hardware/GRC controls
-    print("Listening for picture request.")
+    print("\nListening for picture request.")
     if fem==0:
         FEMControl = GPIO_function(sync=FEMlogic)
 
