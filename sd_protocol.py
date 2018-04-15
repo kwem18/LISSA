@@ -129,6 +129,14 @@ class fileTrack():
             packed_pkt = self.packetize(packed_pkt)     #pkt now has been packe with 'LISSA' protocol, ready for TX!
             final_data += packed_pkt                   #final data holds data to be inserted to GRC_tx
 
+        trash_pkt = "pkt9999"
+        for thing in range(10):
+            trash_pkt += "I BLESS THE RAINS DOWN IN AFRICA"
+        trash_pkt = self.packetize(trash_pkt)       #trash pkt only has 1st layer header
+
+        final_data = trash_pkt + trash_pkt + trash_pkt + trash_pkt + trash_pkt + final_data
+        final_data += trash_pkt + trash_pkt + trash_pkt
+
         sendToGRC(final_data)   # Write the final data to the Tx_input file.
         return
 
@@ -147,7 +155,15 @@ class fileTrack():
         op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
         final_package = op_pktname + message + message + message    #Add pktname to pyld
 
-        final_package = self.packetize(data=final_package)  #add primary header to data
+        final_package = self.packetize(data=final_package)  #add primary header to relevant data
+
+        trash_pkt = "pkt9999"
+        for h in range(10):
+            trash_pkt += " I BLESS THE RAINS DOWN IN AFRICA"
+        trash_pkt = self.packetize(trash_pkt)           #add 1st layer header to trash packet
+
+        final_package = trash_pkt + trash_pkt + trash_pkt + trash_pkt + trash_pkt + final_package
+        final_package += trash_pkt + trash_pkt + trash_pkt
 
         sendToGRC(final_package) # Write the final data to the Tx_input file.
 

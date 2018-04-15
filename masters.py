@@ -294,4 +294,4 @@ if __name__ == "__main__":
 
     testGRCs()
 
-    host(logic,power, debug=debugLevel,fem = FEM_sw)
+    remote(logic,power, debug=debugLevel,fem = FEM_sw)
