@@ -33,7 +33,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     print("/////////////////////////////// ")
     print("|||| Remote Master Program |||| ")
     print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ ')
-
+    print("\n")
     # Initialize hardware/GRC controls
     print("Listening for picture request.")
     if fem==0:
@@ -45,7 +45,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     if fem==0:
         FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
 
-    print("Listening for received packets.")
+    print("Listening for received packets.\n")
     if fem==0:
         FEMControl.RX_FEM()
     if debug>=1:
@@ -278,4 +278,4 @@ if __name__ == "__main__":
 
     testGRCs()
 
-    host(logic,power, debug=debugLevel,fem = FEM_sw)
+    remote(logic,power, debug=debugLevel,fem = FEM_sw)
