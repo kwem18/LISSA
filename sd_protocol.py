@@ -77,11 +77,16 @@ class fileTrack():
 
         # acks is now a list of the successfully received files.
         # Confirm that received acks are actual file names inside fileList. (if they aren't just throw them away)
-        for i in acks:
+        ackLen = len(acks)
+        x = 0
+        while x < ackLen:
+            i = acks[x]
             if i in self.fileList:
                 self.fileList = filter(lambda a: a != i,self.fileList)# if the ack received was in the file list, remove it from the file list so it isnt' sent again
+                x += 1
             else:
                 acks.remove(i) # If the ack wasn't part of the file list, it must have been corrupted, we'll just drop it and resend the file.
+                ackLen += -1
 
         # Delete or remove the old ackPack.
         if delete == 1:
@@ -365,7 +370,7 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
             # Checksum is bytes 11-13
 
             if legalName and legalLength and legalChecksum :
-                data = rx[i+13:i+13+length]
+                data = rx[i+11:i+11+length]
                 pkts[name] = data
                 x += 1 # incrememnt x so we start on the next packet.
             else:
