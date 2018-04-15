@@ -181,6 +181,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
                 if debug >= 1:
                     print("Found opdata!")
                 receivedFiles = sd_protocol.opDataInterp(operatingDir) # Interpret op_data
+                if receivedFiles == "All Received":
+                    break
             else:
                 fileManager.opDataPack("Nothing Received")
         else:
