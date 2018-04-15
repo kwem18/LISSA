@@ -218,12 +218,12 @@ def gr_transmit(power):
 
 
 def gr_receive():
-    gr_rx = GRC_Rx()
-    gr_rx.start() # start the transmit path
+    #gr_rx = GRC_Rx()
+    #gr_rx.start() # start the transmit path
     fileInterfaces.watchFile("Output",changeHold=5,interval=500)
-    gr_rx.stop() # wait for the transmit path to finish
-    sleep(1)
-    gr_rx = None
+    #gr_rx.stop() # wait for the transmit path to finish
+    #sleep(1)
+    #gr_rx = None
 
 
 def prepGRC():
