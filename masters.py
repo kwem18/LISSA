@@ -198,7 +198,7 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
         FEMControl.shutdown()
 
     # Combine the packets into a pictures.
-    pictureName = "picture"+datetime.now().strftime("%m-%d-%H:%M")
+    pictureName = "picture"+datetime.now().strftime("%m-%d-%H:%M")+".jpg"
     fileManip.comb(operatingDir+"pkt",pictureName)
 
     print("File Received, All done.")

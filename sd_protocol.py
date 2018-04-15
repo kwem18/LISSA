@@ -71,7 +71,7 @@ class fileTrack():
         opFile.close()
 
         # Parse opData string as described at the start of this function
-        acks = opData.split(",")
+        acks = opData.split("'")
 
         # acks is now a list of the successfully received files.
         # Confirm that received acks are actual file names inside fileList. (if they aren't just throw them away)
