@@ -3,8 +3,8 @@ from shutil import copyfile
 action = raw_input("1:Host Test   2:Remote Test   ")
 
 if action == "1":
-    while action != "quit":
-        action = raw_input("1:Reset Output, 2:Pic Response, 3:All Received")
+    while 'q' not in action:
+        action = raw_input("1:Reset Output, 2:Pic Response, 3:All Received  ")
 
         if action == "1":
             print("Resetting output file.")
@@ -18,8 +18,8 @@ if action == "1":
 
 
 if action == "2":
-    while action != "quit":
-        action = raw_input("1:Reset Output, 2:Pic Request, 3:Ack Response   ")
+    while 'q' not in action:
+        action = raw_input("1:Reset Output, 2:Pic Request, 3:Ack Response  ")
 
         if action == "1":
             print("Reseting output file.")

@@ -334,12 +334,19 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
 
     # Check all indexes and make sure they reference packet names that can exist
     pkts = dict() # Create a dictionary that holds packet data
-    for i in pktStarts:
+    x = 0
+    lenpktStarts = len(pktStarts)
+    while x < lenpktStarts:
+        i = pktStarts[x]
         try:  # Using try in case we accidently go past the length of the string.
             name = rx[i:i+7]
-            legalName = 1 # All names innocent until proven guilty.
+            legalName = True # All names innocent until proven guilty.
             if name == filePrefix+str(9999): # We don't want to save synchronization packets, so they are illegal.
-                legalName = 0
+                legalName = False
+                print('Illegal Name: '+name)
+
+            if legalName:
+                print("Pkt name = "+name)
 
             # Determine the length of the packet
             length = 0
@@ -349,19 +356,25 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
                 length += temp
 
             # Validate that hte length is legit
-            legalLength = 1 # All lengths are innocent until proven guitly
+            legalLength = True # All lengths are innocent until proven guitly
             if length >= 9999:
                 print("Illegal Length: "+str(length))
-                legalLength = 0
+                legalLength = False
 
-            if legalName == 1 and legalLength == 1:
-                data = rx[i+11:i+11+length]
+            legalChecksum = True
+            # Checksum is bytes 11-13
+
+            if legalName and legalLength and legalChecksum :
+                data = rx[i+13:i+13+length]
                 pkts[name] = data
+                x += 1 # incrememnt x so we start on the next packet.
             else:
-                print("Illegal Packet.")
+                print("Illegal Packet index: "+str(i))
                 pktStarts.remove(i) # Don't save the packets that weren't legal
+                lenpktStarts += -1 # Decrease the length of the packet list because one is removed now.
         except IndexError:
             pktStarts.remove(i) # If pkt i created an index error, remove it from the list, it's incomplete.
+            lenpktStarts += -1 # Decrease the length of the packet list because one is removed now.
             print("Index Error!!!!")
 
     # Save data from the pkts dictionary
