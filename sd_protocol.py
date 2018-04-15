@@ -153,9 +153,25 @@ class fileTrack():
             raise TypeError('"message" parameter must be a string.')
 
         op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
-        final_package = op_pktname + message + message + message    #Add pktname to pyld
+        payload = message + message + message
 
+        ###Start creating 2ndary header-------------------------------
+        # Length Header
+        l_fieldsize = 4
+        pyld_len = len(payload)
+        fieldarray = list(str(pyld_len))  # create empty list
+        lenfield = np.pad(fieldarray, [l_fieldsize - len(fieldarray), 0], "constant", constant_values=0)
+        tmp = [0] * l_fieldsize
+        for index in range(len(lenfield)):
+            if lenfield[index] == '':
+                lenfield[index] = int(lenfield[index])
+            tmp[index] = int(lenfield[index])
+        pkt_length_header = bytearray(tmp)  # This variable will be added with pyld(by
+        final_package = op_pktname + pkt_length_header + payload    #Add pktname to pyld
+        # 2ndary header is attached to data-------------------------------------------
+        print("secondary header made")
         final_package = self.packetize(data=final_package)  #add primary header to relevant data
+        print("Primrary header made")
 
         trash_pkt = "pkt9999"
         for h in range(10):
@@ -260,6 +276,8 @@ def opDataInterp(opMessageLocation,delete=0):
         # There were too many operation packages found.
         raise ValueError("There were too many operation packages found. They should be removed/renamed after being worked with.")
 
+    opPack = opPack[0]
+
     opFile = open(opPack,"rb")
     opData = opFile.read()
     opFile.close()
@@ -306,6 +324,7 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
     rxFile.close()
 
     pktStarts = strSearch(rx,filePrefix)  # Find the indexes where all of the packets start
+    print("pktStarts: "+str(pktStarts))
 
     # Check all indexes and make sure they reference packet names that can exist
     pkts = dict() # Create a dictionary that holds packet data
@@ -314,11 +333,6 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
             name = rx[i:i+7]
             legalName = 1 # All names innocent until proven guilty.
             if name == filePrefix+str(9999): # We don't want to save synchronization packets, so they are illegal.
-                legalName = 0
-            try:
-                nameNumber = name[len(filePrefix):len(filePrefix)+5] # Get the number suffix from the name
-                int(nameNumber) # Attempt to convert the number to a integer. If it's not, this will raise an error.
-            except ValueError: # Catch error if nameNumber isn't a number
                 legalName = 0
 
             # Determine the length of the packet
@@ -331,18 +345,22 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
             # Validate that hte length is legit
             legalLength = 1 # All lengths are innocent until proven guitly
             if length >= 9999:
+                print("Illegal Length: "+str(length))
                 legalLength = 0
 
             if legalName == 1 and legalLength == 1:
                 data = rx[i+11:i+11+length]
                 pkts[name] = data
             else:
+                print("Illegal Packet.")
                 pktStarts.remove(i) # Don't save the packets that weren't legal
         except IndexError:
             pktStarts.remove(i) # If pkt i created an index error, remove it from the list, it's incomplete.
+            print("Index Error!!!!")
 
     # Save data from the pkts dictionary
     keys = pkts.keys()
+    print("Saving Packets: "+str(keys))
     for i in keys:
         fileSegment = open(operatingFolder+i,'wb')
         fileSegment.write(pkts[i])

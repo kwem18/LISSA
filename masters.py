@@ -56,16 +56,17 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     # Interpret the received command
     sd_protocol.unpack("Output",filePrefix="op_data",operatingFolder=operatingDir)
     opMesssage = sd_protocol.opDataInterp(operatingDir)
-
+    print("opMessage : " + opMesssage)
+    print("operatingFolder : " + operatingDir)
     if opMesssage == "picReq":
-        # take a picture
+        # take a picPCITUREture
         #picLocation = Camera_control.takepicture()
         picLocation = "sat_pic.JPG"
         if debug>=2:
-            print("SPLITTING PCITURE FROM DIRECTORY")
+            print("SPLITTING PICTURE FROM DIRECTORY")
 
         #split the picture
-        fileManip.cut(operatingDir+"pkt",picLocation,1000)
+        fileManip.cut(picLocation,operatingDir+"pkt",1000)
 
         # Initilize the file manager
         fileManager = sd_protocol.fileTrack(operatingDir, preamble='26530',filePrefix='pkt')
