@@ -153,9 +153,25 @@ class fileTrack():
             raise TypeError('"message" parameter must be a string.')
 
         op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
-        final_package = op_pktname + message + message + message    #Add pktname to pyld
+        payload = message + message + message
+
+        ###Start creating 2ndary header-------------------------------
+        # Length Header
+        l_fieldsize = 4
+        pyld_len = len(payload)
+        fieldarray = list(str(pyld_len))  # create empty list
+        lenfield = np.pad(fieldarray, [l_fieldsize - len(fieldarray), 0], "constant", constant_values=0)
+        tmp = [0] * l_fieldsize
+        for index in range(len(lenfield)):
+            if lenfield[index] == '':
+                lenfield[index] = int(lenfield[index])
+            tmp[index] = int(lenfield[index])
+        pkt_length_header = bytearray(tmp)  # This variable will be added with pyld(by
+        final_package = op_pktname + pkt_length_header + payload    #Add pktname to pyld
+        # 2ndary header is attached to data-------------------------------------------
 
         final_package = self.packetize(data=final_package)  #add primary header to relevant data
+
 
         trash_pkt = "pkt9999"
         for h in range(10):

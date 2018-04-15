@@ -56,7 +56,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     # Interpret the received command
     sd_protocol.unpack("Output",filePrefix="op_data",operatingFolder=operatingDir)
     opMesssage = sd_protocol.opDataInterp(operatingDir)
-
+    print("opMessage : " + opMesssage)
     if opMesssage == "picReq":
         # take a picture
         #picLocation = Camera_control.takepicture()
