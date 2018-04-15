@@ -34,8 +34,8 @@ class fileTrack():
         self.filePrefix = filePrefix
         print("----------\noperatingdir:" + str(self.operatingDir) +"\n--------")
         # create the file list here.
-        files = glob(self.operatingDir+self.filePrefix)
-        print("Discovered files: " + str(files))
+        files = glob(self.operatingDir+self.filePrefix+"*")
+        #print("Discovered files: " + str(files))
         self.fileList = []
         for i in range(len(files)):
             fileName = files[i].split("/")[1]
@@ -124,7 +124,7 @@ class fileTrack():
             pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
 
             ### Create checksum by calling CREATE_CHECKSUM definition-------
-            pkt_checksum_header = self.CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = pktname)
+            pkt_checksum_header = CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = pktname)
             packed_pkt = pktname + pkt_length_header + pkt_checksum_header + payload
 
             ### add primary header
@@ -385,7 +385,8 @@ def CREATE_CHECKSUM(pyld,len_header,pktname):  #NOTE: len_header can be either s
     ##Typeerror checks
     if (type(pyld) != type('pyld')):
         raise TypeError('Data must be string type')
-    if ( type(len_header) != type(bytearray(1)) | type(len_header) != type('i') ):
+    if ( (type(len_header) != type(bytearray(1))) & (type(len_header) != type('i')) ):
+        #print("type for len_header" + str(type(len_header)))
         raise TypeError('Data must be bytearray type or a string')
     if (type(pktname) != type('filename')):
         raise TypeError('filename must be in string type')
