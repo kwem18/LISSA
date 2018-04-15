@@ -144,7 +144,7 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
         print("Created operating dirrectory as : "+str(operatingDir))
 
     # Create file manager object
-    fileManager = sd_protocol.fileTrack(operatingDir,preamble="26530",filePrefix='pkt')
+    fileManager = sd_protocol.fileTrack(operatingDir,preamble=26530,filePrefix='pkt')
     if debug >= 2:
         print("Initilized fileTrack.")
 
@@ -153,7 +153,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
     # Package picture request for transmission
     fileManager.opDataPack("Send Picture")
 
-    FEMControl.ENABLE_FEM(switch=1)
+    if fem == 0:
+        FEMControl.ENABLE_FEM(switch=1)
 
     # Run GRC TX to send the opPack
     if debug >= 0:
@@ -192,15 +193,17 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
                 if debug >= 1:
                     print("Found opdata!")
                 receivedFiles = sd_protocol.opDataInterp(operatingDir) # Interpret op_data
-
-        # Reply with ack pack of received files
-        fileManager.opDataPack(receivedFiles)
-        if debug >= 0:
-            print("Transmitting ack pack")
-        if fem==0:
-            FEMControl.TX_FEM()
-        gr_tx.start()
-        gr_tx.wait()
+            else:
+                fileManager.opDataPack("Nothing Received")
+        else:
+            # Reply with ack pack of received files
+            fileManager.opDataPack(str(receivedFiles))
+            if debug >= 0:
+                print("Transmitting ack pack")
+            if fem==0:
+                FEMControl.TX_FEM()
+            gr_tx.start()
+            gr_tx.wait()
 
     if debug >=0:
         print("All Packets Received!")
