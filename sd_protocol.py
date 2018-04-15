@@ -362,17 +362,29 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
                 temp = temp * int(np.power(10, (3 - j)))
                 length += temp
 
-            # Validate that hte length is legit
+            # Validate that the length is legit
             legalLength = True # All lengths are innocent until proven guitly
             if length >= 9999:
                 print("Illegal Length: "+str(length))
                 legalLength = False
 
-            legalChecksum = True
-            # Checksum is bytes 11-13
+            if legalName and legalLength:
+                data = rx[i+13:i+13+length]
 
-            if legalName and legalLength and legalChecksum :
-                data = rx[i+11:i+11+length]
+            ## validation of checksum-----------------------------------------------
+            receivedCheck = rx[i+11:i+13]
+
+            #compute checksum again
+
+            createdCheck = CREATE_CHECKSUM(data,length,name)#call checksum function
+
+            legalChecksum = True  # Checksums are considered legal until proven otherwise
+            if createdCheck != receivedCheck:
+                legalChecksum = False
+
+            ##checksum test concluded-----------------------------------------------
+
+            if legalName and legalLength and legalChecksum:
                 pkts[name] = data
                 x += 1 # incrememnt x so we start on the next packet.
             else:
