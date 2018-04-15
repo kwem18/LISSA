@@ -100,7 +100,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
 
         print("Picture successfully transmitted.")
 
-        fileManager.opDataPack("Tx Done")
+        #fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
         if fem==0:
             FEMControl.TX_FEM()
         if debug>=0:
@@ -280,4 +280,4 @@ if __name__ == "__main__":
 
     testGRCs()
 
-    host(logic,power, debug=debugLevel,fem = FEM_sw)
+    remote(logic,power, debug=debugLevel,fem = FEM_sw)
