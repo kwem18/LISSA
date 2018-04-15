@@ -104,7 +104,7 @@ class fileTrack():
         # Made by Erick Terrazas
         #NO RETURN OBJECT ONLY CREAT TX_INPUT.BIN
         # Packages the file list into a file ready for GNU Radio
-        print("CURRENT FILE LIST:" + str(self.fileList))
+        #print("CURRENT FILE LIST:" + str(self.fileList))
         l_fieldsize = 4 #size of length header (secondary)
         final_data = ''
         for pktname in self.fileList:
