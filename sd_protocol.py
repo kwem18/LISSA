@@ -291,6 +291,8 @@ def opDataInterp(opMessageLocation,delete=0):
         opMessage = "picReq"
     elif "powerOff" in opData:
         opMessage = "reboot"
+    elif "All Received" in opData:
+        opMessage = "All Received"
     else:
         opMessage = "messageError"
 
