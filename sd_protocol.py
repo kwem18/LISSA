@@ -187,7 +187,6 @@ class fileTrack():
 
         ## Send ms over UDP to GRC ### NOW JUST RETURN DATA
         message = syncdata + header + data
-        print "packet:", message
         return message
         # self.sock.sendto(message, (self.ip,self.port))
 

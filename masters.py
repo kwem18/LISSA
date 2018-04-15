@@ -7,6 +7,7 @@ import fileInterfaces
 import fileManip
 import sd_protocol
 
+from time import sleep
 from datetime import datetime
 from shutil import copyfile
 import os
@@ -16,11 +17,15 @@ def testGRCs():
         gr_rx = GRC_Rx()
         gr_tx = GRC_Tx(IF_Gain=3)
     except TypeError:
+        sleep(1)
         gr_rx = None
         gr_tx = None
         prepGRC()
         gr_rx = GRC_Rx()
         gr_tx = GRC_Tx(IF_Gain=3)
+        sleep(1)
+        gr_rx = None
+        gr_tx = None
 
 
 def remote(FEMlogic,power,debug = 0,fem = 1):
@@ -31,8 +36,6 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
 
     # Initialize hardware/GRC controls
     print("Listening for picture request.")
-    gr_rx = GRC_Rx()
-    gr_tx = GRC_Tx(IF_Gain=power)
     if fem==0:
         FEMControl = GPIO_function(sync=FEMlogic)
 
@@ -47,9 +50,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
         FEMControl.RX_FEM()
     if debug>=1:
         print("gr_rx turning on")
-    gr_rx.start()  # start the receive path
-    fileInterfaces.watchFile("Output", changeHold=5, interval=500) # stays in function till file change detected.
-    gr_rx.stop()  # Stop the receive path after the Output file wasn't changed for 2500ms
+    gr_receive()
     if debug>=1:
         print("grc_rx turning off")
     # Interpret the received command
@@ -77,21 +78,15 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             # Transmit the packet file
             if fem==0:
                 FEMControl.TX_FEM()
-            gr_tx.start()
-            gr_tx.wait()
+            gr_transmit(power)
 
             # Wait for the ackpack
             if fem==0:
                 FEMControl.RX_FEM()
-            gr_rx.start()
             if debug>=1:
-                print("gr_rx is starting")
-            if debug>=0:
-                print("Starting watchFile definition")
-            fileInterfaces.watchFile("Output", changeHold=5,
-                                     interval=500)  # stays in function till file change detected.
-            gr_rx.stop()  # Stop the receive path after the Output file wasn't changed for 2500ms
-            if debug>=1:
+                print("Starting GRC Receive")
+            gr_receive()
+            if debug>=2:
                 print("gr_rx has stopped")
             # Unpack the ackPack
             if debug>=0:
@@ -108,8 +103,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             FEMControl.TX_FEM()
         if debug>=0:
             print("gr_tx is sending operational data of 'Tx'_done")
-        gr_tx.start()
-        gr_tx.wait()
+        gr_transmit(power)
 
         print("All done!")
         ###SHUTDONW BELOW WAS ADDED BY ERICK
@@ -123,13 +117,8 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
     print("||||| Host Master Program ||||| ")
     print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ ')
 
-    #Initiate GNU Radio Files
-    gr_rx = GRC_Rx()
-    gr_tx = GRC_Tx(IF_Gain = power)
     if fem==0:
         FEMControl = GPIO_function(sync = FEMlogic)
-    if debug >= 1:
-        print("Initilized GNU Radio Programs.")
 
     if userinput == 1:
         raw_input("Send Picture Request? (remote node must be running.) [enter]")
@@ -161,8 +150,7 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
         print("Transmitting Picture Request")
     if fem==0:
         FEMControl.TX_FEM()
-    gr_tx.start() # start the transmit path
-    gr_tx.wait() # wait for the transmit path to finish
+    gr_transmit(power)
     if debug >= 1:
         print("Finished transmitting picture request")
 
@@ -173,9 +161,7 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
             print("Waiting to receive data packages")
         if fem==0:
             FEMControl.RX_FEM()
-        gr_rx.start()  # start the receive path
-        fileInterfaces.watchFile("Output",changeHold=5,interval=500)
-        gr_rx.stop() # Stop the receive path after the Output file wasn't changed for 2500ms
+        gr_receive()
         if debug >= 1:
             print("Finished receiving file.")
 
@@ -198,12 +184,11 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
         else:
             # Reply with ack pack of received files
             fileManager.opDataPack(str(receivedFiles))
-            if debug >= 0:
-                print("Transmitting ack pack")
-            if fem==0:
-                FEMControl.TX_FEM()
-            gr_tx.start()
-            gr_tx.wait()
+        if debug >= 0:
+            print("Transmitting status packet")
+        if fem==0:
+            FEMControl.TX_FEM()
+        gr_transmit(power)
 
     if debug >=0:
         print("All Packets Received!")
@@ -222,6 +207,23 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
         FEMControl.shutdown()
 
 
+def gr_transmit(power):
+    gr_tx = GRC_Tx(IF_Gain = power)
+    gr_tx.start() # start the transmit path
+    gr_tx.wait() # wait for the transmit path to finish
+    sleep(1)
+    gr_tx = None
+
+
+def gr_receive():
+    gr_rx = GRC_Rx()
+    gr_rx.start() # start the transmit path
+    fileInterfaces.watchFile("Output",changeHold=5,interval=500)
+    gr_rx.stop() # wait for the transmit path to finish
+    sleep(1)
+    gr_rx = None
+
+
 def prepGRC():
     # Called to prepare the grc python files.
     # Restors python top block file for GRC file control
@@ -236,26 +238,6 @@ def prepGRC():
     copyfile("GRC_Tx_Callable.py","grc_files/GRC_Tx.py")
 
 
-
-if __name__ == "__main__":
-    FEM_choice = raw_input("Do you wish to use the FEM module? [Y]es or [N]o.")
-    if 'y' in FEM_choice or 'Y' in FEM_choice:
-        FEM_sw = 0  # zero means yes we want FEM activating
-    elif 'n' in FEM_choice or 'N' in FEM_choice:
-        FEM_sw = 1
-    else:
-        raise ValueError("Input must be specified as [Y]es or [N]o.")
-
-    if FEM_sw == 0:
-        sequential = raw_input("Is this device using the sequential logic FEM control board? ([Y]es/[N]o) ")
-        if 'y' in sequential or 'Y' in sequential:
-            logic = 0
-        elif 'n' in sequential or 'N' in sequential:
-            logic = 1
-        else:
-            raise ValueError("Input must be specified as [Y]es or [N]o.")
-    else:
-        logic = 1
 if False:
     if __name__ == "__main__":
         sequential = raw_input("Is this device using the sequential logic FEM control board? ([Y]es/[N]o) ")
