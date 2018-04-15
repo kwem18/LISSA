@@ -59,7 +59,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     print("opMessage : " + opMesssage)
     print("operatingFolder : " + operatingDir)
     if opMesssage == "picReq":
-        # take a picPCITUREture
+        # take a pciture
         #picLocation = Camera_control.takepicture()
         picLocation = "sat_pic.JPG"
         if debug>=2:
@@ -75,7 +75,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
         while filesRemaining > 0:
             # Create a packet file to call against gnu radio
             fileManager.filePack()
-
+            print("filesRemaining after filepack iteration:" + str(filesRemaining))
             # Transmit the packet file
             if fem==0:
                 FEMControl.TX_FEM()

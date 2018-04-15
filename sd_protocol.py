@@ -32,14 +32,15 @@ class fileTrack():
 
         self.preamble = int(preamble)
         self.filePrefix = filePrefix
-
+        print("----------\nsoperatingdir:" + str(self.operatingDir) +"\n--------")
         # create the file list here.
         files = glob(self.operatingDir+self.filePrefix)
-
+        print("Discovered files: " + str(files))
         self.fileList = []
         for i in range(len(files)):
             fileName = files[i].split("/")[1]
             self.fileList.append(fileName)
+        print("FILE LIST:" + str(self.fileList))
 
     def ackInterp(self,ackLocation,delete=0):
         # Made by William
@@ -103,6 +104,7 @@ class fileTrack():
         # Made by Erick Terrazas
         #NO RETURN OBJECT ONLY CREAT TX_INPUT.BIN
         # Packages the file list into a file ready for GNU Radio
+        print("CURRENT FILE LIST:" + str(self.fileList))
         l_fieldsize = 4 #size of length header (secondary)
         final_data = ''
         for pktname in self.fileList:
