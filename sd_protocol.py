@@ -129,9 +129,14 @@ class fileTrack():
                 tmp[index] = int(lenfield[index])
             pkt_length_header = bytearray(tmp)      #This variable will be added with pyld(bytearray type)
 
+
+            print("Creating! data: "+str(len(payload)))
+            print("Creating! length: "+str(pyld_len))
+            print("Creating! name: "+str(pktname))
             ### Create checksum by calling CREATE_CHECKSUM definition-------
-            pkt_checksum_header = CREATE_CHECKSUM(pyld = payload,len_header=pkt_length_header,pktname = pktname)
+            pkt_checksum_header = CREATE_CHECKSUM(payload,pyld_len,pktname)
             packed_pkt = pktname + pkt_length_header + pkt_checksum_header + payload
+            print("Created checksum: "+str(pkt_checksum_header))
 
             ### add primary header
             packed_pkt = self.packetize(packed_pkt)     #pkt now has been packe with 'LISSA' protocol, ready for TX!
@@ -176,7 +181,10 @@ class fileTrack():
                 lenfield[index] = 0 # Changed from equal to int(lenfield[index])
             tmp[index] = int(lenfield[index])
         pkt_length_header = bytearray(tmp)  # This variable will be added with pyld(by
-        final_package = op_pktname + pkt_length_header + payload    #Add pktname to pyld
+
+        pkt_checksum_header = CREATE_CHECKSUM(payload,pyld_len,op_pktname)
+
+        final_package = op_pktname + pkt_length_header + pkt_checksum_header + payload    #Add pktname to pyld
         # 2ndary header is attached to data-------------------------------------------
         print("secondary header made")
         final_package = self.packetize(data=final_package)  #add primary header to relevant data
@@ -355,6 +363,8 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
             if legalName:
                 print("Pkt name = "+name)
 
+
+            l_fieldsize = 4 #size of length header (secondary)
             # Determine the length of the packet
             length = 0
             for j in range(4):
@@ -374,13 +384,12 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
             ## validation of checksum-----------------------------------------------
             receivedCheck = rx[i+11:i+13]
 
+            legalChecksum = False  # Checksums are considered illegal until proven otherwise
             #compute checksum again
-
-            createdCheck = CREATE_CHECKSUM(data,length,name)#call checksum function
-
-            legalChecksum = True  # Checksums are considered legal until proven otherwise
-            if createdCheck != receivedCheck:
-                legalChecksum = False
+            if legalName and legalLength:
+                createdCheck = CREATE_CHECKSUM(data,length,name)#call checksum function
+                if createdCheck == receivedCheck:
+                    legalChecksum = True
 
             ##checksum test concluded-----------------------------------------------
 
@@ -419,12 +428,11 @@ def CREATE_CHECKSUM(pyld,len_header,pktname):  #NOTE: len_header can be either s
     checksum_field = bytearray(2)
     checksum = 0
     ##Typeerror checks
-    if (type(pyld) != type('pyld')):
+    if (type(pyld) != str):
         raise TypeError('Data must be string type')
-    if ( (type(len_header) != type(bytearray(1))) & (type(len_header) != type('i')) ):
-        #print("type for len_header" + str(type(len_header)))
+    if type(len_header) != int:
         raise TypeError('Data must be bytearray type or a string')
-    if (type(pktname) != type('filename')):
+    if (type(pktname) != str):
         raise TypeError('filename must be in string type')
 
     ### First we have to add binary data of filename into checksum
@@ -433,14 +441,11 @@ def CREATE_CHECKSUM(pyld,len_header,pktname):  #NOTE: len_header can be either s
         checksum += num_val         #add numerical representation
         #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
-    ### next add header field binary data
-    if type(len_header) == type('str'):
-        for alpha in len_header:
-            checksum += ord(alpha)
-    elif type(len_header) == type(bytearray(1)):
-        len_header = str(len_header)        #byte array converted to str (equivalent to converting to binary data)
-        for beta in len_header:             #beta represents a byte of len_header
-            checksum += ord(beta)           #take integer equivalent, add to checksum
+    ### Now we have to add binary data of length into checksum
+    len_header = str(len_header)
+    for str_byte in len_header:
+        num_val = ord(str_byte)     #Take each byte and just add it to data
+        checksum += num_val         #add numerical representation
         #checksum = (checksum >> 16) + (checksum & 0xFFFF)
 
     ###NOw we add pyld binary data

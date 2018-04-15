@@ -99,6 +99,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             filesRemaining = fileManager.ackInterp(operatingDir)
 
         print("Picture successfully transmitted.")
+        fileManager.opDataPack("All Received")
 
         #fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
         if fem==0:
@@ -181,6 +182,7 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
                 if debug >= 1:
                     print("Found opdata!")
                 receivedFiles = sd_protocol.opDataInterp(operatingDir) # Interpret op_data
+                print("Op Data: "+receivedFiles)
                 if receivedFiles == "All Received":
                     break
             else:
@@ -280,4 +282,10 @@ if __name__ == "__main__":
 
     testGRCs()
 
-    remote(logic,power, debug=debugLevel,fem = FEM_sw)
+    remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
+    if "R" in remote_or_host or "r" in remote_or_host:
+        remote(logic,power,debug = debugLevel,fem = FEM_sw)
+    elif "H" in remote_or_host or "h" in remote_or_host:
+        host(logic,power, debug=debugLevel,fem = FEM_sw)
+    else:
+        raise ValueError("Input must be specified as [H]ost or [R]emote.")
