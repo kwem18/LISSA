@@ -1,7 +1,8 @@
 import os
 from time import sleep
+from time import time
 
-def watchFile(fileName,change="size",interval=50,changeHold = -1):
+def watchFile(fileName,change="size",interval=50,changeHold = -1,stopAfter = 60*5):
     # Watches for changes to the file fileName.
     # Change is the property that is being watched for changes.
     # Interval is the frequency that changes are checked.
@@ -26,17 +27,25 @@ def watchFile(fileName,change="size",interval=50,changeHold = -1):
     if not os.path.isfile(fileName):
         raise IOError("fileName fails to point to a file that exists.")
 
+    if (type(stopAfter) != int) or type(stopAfter) != float:
+        raise TypeError("stopAfter should be specified as a int or float in seconds.")
+
     # Change unit of interval from milliseconds to seconds for sleep
     interval = interval/1000.
 
     # Get the initial value
     lastValue = dynamicStat(fileName,change)
 
+    # Set the time to stop watching
+    stopTime = time()+stopAfter
+    curtime = time()
+
     # Stay in this loop until a change is detected.
     newValue = lastValue
-    while newValue == lastValue:
+    while newValue == lastValue and curtime < stopTime:
         sleep(interval)
         newValue = dynamicStat(fileName,change)
+        curtime = time()
 
     lastValue = newValue
     steadyReps = 0 # keeps track of number of occurences where no change to the file occured in the polling period.
@@ -49,6 +58,7 @@ def watchFile(fileName,change="size",interval=50,changeHold = -1):
             steadyReps = 0 # if a change was detected, reset the steady repetition counter.
         sleep(interval)
         lastValue = newValue # Set the newValue to the last value and loop again.
+        curtime = time()
 
     success = 1
 
