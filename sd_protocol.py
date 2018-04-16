@@ -142,15 +142,19 @@ class fileTrack():
             packed_pkt = self.packetize(packed_pkt)     #pkt now has been packe with 'LISSA' protocol, ready for TX!
             final_data += packed_pkt                   #final data holds data to be inserted to GRC_tx
 
+        #'final_data' now has each pkt appended on top of eachother (achieved after for loop is complete)
+
+        ##Process to create trash packets (OBSELETE AS OF 4/15/18)----------------------------
         trash_pkt = "pkt9999"
         for thing in range(10):
             trash_pkt += "I BLESS THE RAINS DOWN IN AFRICA"
         trash_pkt = self.packetize(trash_pkt)       #trash pkt only has 1st layer header
+        ##Trash pkt template made and defined to 'trash_pkt'-----------------------------------
 
-        final_data = trash_pkt + trash_pkt + trash_pkt + trash_pkt + trash_pkt + final_data
-        final_data += trash_pkt + trash_pkt + trash_pkt
+        #final_data = trash_pkt + trash_pkt + trash_pkt + trash_pkt + trash_pkt + final_data
+        #final_data += trash_pkt + trash_pkt + trash_pkt
 
-        sendToGRC(final_data)   # Write the final data to the Tx_input file.
+        sendToGRC(final_data)   # Write the final data to the Tx_input file. GRC_TX READY TO SEND PICTURE PKTS
         return
 
     def opDataPack(self,message):
@@ -200,14 +204,9 @@ class fileTrack():
         trash_pkt = self.packetize(trash_pkt)           #add 1st layer header to trash packet
          ###CREATED A TRASH PACKET TEMPLATE----------------------------------------
 
-        final_package = trash_pkt + final_package    #append pkt to opdata pkt
-        final_package = final_package+final_package + final_package+final_package+final_package + final_package
-        for i in range(3):
-            final_package = final_package + trash_pkt + packed_op_data_pkt
-        for i in range(5):
-            final_package = final_package + final_package
+        final_package = final_package + final_package + final_package # SEND 3 pkts of same msg
 
-        sendToGRC(final_package) # Write the final data to the Tx_input file.
+        sendToGRC(final_package) # Write the final data to the Tx_input file. GRC_TX READY TO TX OP_DATA
 
     def packetize(self, data):
         # Made by William
