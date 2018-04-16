@@ -19,17 +19,25 @@ import time # For time
 import threading            #For clock signal implementation
 
 # END MODULES----------------------------------------------------------------------
-
+#init parameters:
+#sync determines if we use sync signal (0 = no, 1 = yes)
+#sw_control deterimnes whehter we intialize pins C3 and C4 for Hawiii device (0 = no, 1= yes)
 ###DEFINITIONS---------------------------------------------------------------------
 class GPIO_function:
     clk_freq = float(25)
-    def __init__(self,sync=0):
-        print('INITIALIZE GPIO BOARD')
+    def __init__(self,sync=0,sw_control=0):
+        print('INITIALIZE GPIO BOARD>>>')
         FT232H.use_FT232H()             #Temorarily disable FTDI Driver
         self.ft232h = FT232H.FT232H()   #Find device
         self.ft232h.setup(8,GPIO.OUT)   #PIN 8 maps to BOARD PORT C0    CONTROL SIGNAL
         self.ft232h.setup(9,GPIO.OUT)   #PIN 9 maps to BOARD PORT C1   ENABLE SIGNAL
-        self.ft232h.setup(10,GPIO.OUT)  # PIN 10 maps to BOARD PORT C2   CLOCK SIGNAL
+        self.ft232h.setup(10,GPIO.OUT)  #PIN 10 maps to BOARD PORT C2   CLOCK SIGNAL
+
+        self.sw_control = int(sw_control)   #Define sw_control param to a class scope variable
+        if self.sw_control==1:
+            self.ft232h.setup(11,GPIO.OUT)  #PIN 11 maps to BOARD PORT C3   Control1 (SWITCH)
+            self.ft232h.setup(12,GPIO.OUT)  #PIN 12 maps to BOARD PORT C4   control2 (SWTICH)
+
         self.initial = int(0)           #to be used for time displacement of cmd
         self.final = int(0)             #to be used for time displacement of cmd
         self.clock = threading.Thread(target=self.run_clock)      #Thread exclusively for CLOCK (C2)
@@ -42,17 +50,23 @@ class GPIO_function:
 
     def ENABLE_FEM(self,switch=0):
         initial = time.clock()                  #Start clocking in time displacement
-        if (switch == 0):                       # We want to turn off DC voltage
-            print('\nFEM SHUTTING DOWN...')
-
+        if (switch == 0):                       # We want to turn OFF DC voltage
+            print('\nFEM TURNING OFF ENABLE...')
             self.ft232h.output(9,GPIO.LOW)      # TURN ENABLE GPIO OFF(DC)
             time.sleep(0.4)                     # Cautionary pause to avoid data overload of GPIO board
             #self.ft232h.output(8, GPIO.LOW)    # Drive Control signal to low voltage by default
             self.final = time.clock()           # time final timestamp
-            if self.sync == 1 & self.paused == False:
-                print("Clock still running!")
 
+            if self.sync == 1 & self.paused == False:
+                print("SYNC Clock still running!")
+
+            if self.sw_control==1:          #IF SWITCH =0 , WE TURN OFF CONTROL_1 and CONTROL_2
+                self.ft232h.output(11,GPIO.LOW)
+                time.sleep(0.2)
+                self.ft232h.output(12,GPIO.LOW)
+                time.sleep(0.2)
             print('Time elapsed:' + str((self.final - self.initial)) )
+
         elif (switch == 1):                     # Turn on ENABLE
             print('\nFEM ACTIVATING...')
             self.ft232h.output(9, GPIO.HIGH)    # TURN ENABLE SIGNAL ON(DC)
@@ -68,15 +82,25 @@ class GPIO_function:
 
 
     def TX_FEM(self):
-        print('\nFEM ----> TX MODE')
-        self.ft232h.output(8,GPIO.HIGH)          #DRIVE CONTROL SIGNAL TO HIGH VOLTAGE
+        print('\nFEM --------------> TX MODE')
+        self.ft232h.output(8,GPIO.HIGH)          #DRIVE CONTROL_0 SIGNAL TO HIGH VOLTAGE
         time.sleep(0.2)
+        if self.sw_control==1:
+            self.ft232h.output(11,GPIO.HIGH)    #Drive control_1(C3) high
+            time.sleep(0.35)
+            self.ft232h.output(12,GPIO.LOW)   #Drive control_2(C4) low
+            time.sleep(0.35)
         return
 
     def RX_FEM(self):
-        print('\nFEM ----> RX MODE')
+        print('\nFEM --------------> RX MODE')
         self.ft232h.output(8,GPIO.LOW)           #DRIVE CONTROL SIGNAL TO LOW VOLTAGE
         time.sleep(0.2)
+        if self.sw_control==1:
+            self.ft232h.output(11,GPIO.LOW)    #Drive control_1(C3) low
+            time.sleep(0.35)
+            self.ft232h.output(12,GPIO.HIGH)   #Drive control_2(C4) High
+            time.sleep(0.35)
         return
 
     def start_clock(self):     #runs clock thread intilzaed as self.clock (in __init__)
@@ -120,13 +144,21 @@ class GPIO_function:
         # print('Thread is dead')
 
     def shutdown(self):
+        print("COMMENCE SHUTDOWN OF FEM<<<<<<<<<")
         if(self.sync==1):
             self.off = 0                  #STOP clock(PIN C2) using self.off
+            time.sleep(0.2)
 
-        self.ft232h.output(10,GPIO.LOW)
+        if self.sw_control==1:
+            self.ft232h.output(11,GPIO.LOW)    #Drive control_1(C3) high
+            time.sleep(0.35)
+            self.ft232h.output(12,GPIO.LOW)   #Drive control_2(C4) low
+            time.sleep(0.35)
+
+        self.ft232h.output(10,GPIO.LOW)     #Drive sync port low (BACKUP JUST IN CASE)
         time.sleep(0.2)
         self.ft232h.output(8,GPIO.LOW)      #Drive control port(PIN C0) LOW
         time.sleep(0.2)
         self.ft232h.output(9,GPIO.LOW)      #Drive Enable port (PIN C1) LOW
         time.sleep(0.2)
-        print('Shutdown conducted.')
+        print('SHUTDOWN OF FEM COMPLETE.')
