@@ -290,7 +290,7 @@ if __name__ == "__main__":
     debugLevel = 5
     FEM_sw = 1
 
-    testGRCs()
+    #testGRCs()
 
     remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
     if "R" in remote_or_host or "r" in remote_or_host:

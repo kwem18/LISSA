@@ -3,9 +3,8 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Grc Rx
-# Generated: Sun Apr 15 19:06:16 2018
+# Generated: Sun Apr 15 18:57:41 2018
 ##################################################
-
 
 from gnuradio import blocks
 from gnuradio import digital
@@ -53,7 +52,7 @@ class GRC_Rx(gr.top_block):
         self.osmosdr_source_0.set_bb_gain(10, 0)
         self.osmosdr_source_0.set_antenna('LNAW', 0)
         self.osmosdr_source_0.set_bandwidth(rf_bw, 0)
-
+          
         self.digital_psk_demod_0_0_0 = digital.psk.psk_demod(
           constellation_points=const_points,
           differential=True,
@@ -67,18 +66,18 @@ class GRC_Rx(gr.top_block):
           )
         self.digital_costas_loop_cc_0 = digital.costas_loop_cc(0.99, const_points, False)
         self.correctiq_correctiq_0 = correctiq.correctiq()
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, '/home/odroid/GitRepos/LISSA_BRANCHES/LISSA/Output', False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, '/home/odroid/GitRepos/LISSA_branches/Full-sys-Int/Output', False)
         self.blocks_file_sink_0.set_unbuffered(True)
         self.Senior_Design_Preamble_Detection_py_bb_0 = Senior_Design.Preamble_Detection_py_bb(26530, 1)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.Senior_Design_Preamble_Detection_py_bb_0, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.correctiq_correctiq_0, 0), (self.digital_costas_loop_cc_0, 0))
-        self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_psk_demod_0_0_0, 0))
-        self.connect((self.digital_psk_demod_0_0_0, 0), (self.Senior_Design_Preamble_Detection_py_bb_0, 0))
-        self.connect((self.osmosdr_source_0, 0), (self.correctiq_correctiq_0, 0))
+        self.connect((self.Senior_Design_Preamble_Detection_py_bb_0, 0), (self.blocks_file_sink_0, 0))    
+        self.connect((self.correctiq_correctiq_0, 0), (self.digital_costas_loop_cc_0, 0))    
+        self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_psk_demod_0_0_0, 0))    
+        self.connect((self.digital_psk_demod_0_0_0, 0), (self.Senior_Design_Preamble_Detection_py_bb_0, 0))    
+        self.connect((self.osmosdr_source_0, 0), (self.correctiq_correctiq_0, 0))    
 
     def get_baud_rate(self):
         return self.baud_rate

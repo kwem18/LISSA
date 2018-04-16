@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.10'?>
 <flow_graph>
   <timestamp>Sun Feb 25 11:58:42 2018</timestamp>
   <block>
@@ -713,7 +713,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/odroid/GitRepos/LISSA_BRANCHES/LISSA/TX_INPUT.bin</value>
+      <value>/home/odroid/GitRepos/LISSA_branches/Full-sys-Int/TX_INPUT.bin</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -4356,10 +4356,6 @@
     <param>
       <key>srate</key>
       <value>BB_samp_rate</value>
-    </param>
-    <param>
-      <key>stemplot</key>
-      <value>False</value>
     </param>
     <param>
       <key>tr_chan</key>
