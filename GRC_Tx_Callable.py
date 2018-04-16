@@ -3,8 +3,9 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Grc Tx
-# Generated: Sat Apr 14 18:45:00 2018
+# Generated: Sun Apr 15 19:06:12 2018
 ##################################################
+
 
 from gnuradio import blocks
 from gnuradio import digital
@@ -20,7 +21,7 @@ import time
 
 class GRC_Tx(gr.top_block):
 
-    def __init__(self,IF_Gain = 3):
+    def __init__(self,IF_Gain=3):
         gr.top_block.__init__(self, "Grc Tx")
 
         ##################################################
@@ -48,7 +49,7 @@ class GRC_Tx(gr.top_block):
         self.osmosdr_sink_0.set_bb_gain(30, 0)
         self.osmosdr_sink_0.set_antenna('BAND1', 0)
         self.osmosdr_sink_0.set_bandwidth(5e6, 0)
-          
+
         self.digital_psk_mod_0_0_0 = digital.psk.psk_mod(
           constellation_points=const_points,
           mod_code="gray",
@@ -59,15 +60,15 @@ class GRC_Tx(gr.top_block):
           log=False,
           )
         self.blocks_multiply_const_vxx_0_0_0 = blocks.multiply_const_vcc((.4, ))
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/odroid/Desktop/BER_TEST_OverCables/TX_INPUT.bin', False)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/odroid/GitRepos/LISSA_BRANCHES/LISSA/TX_INPUT.bin', False)
         (self.blocks_file_source_0).set_max_output_buffer(5000000)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_file_source_0, 0), (self.digital_psk_mod_0_0_0, 0))    
-        self.connect((self.blocks_multiply_const_vxx_0_0_0, 0), (self.osmosdr_sink_0, 0))    
-        self.connect((self.digital_psk_mod_0_0_0, 0), (self.blocks_multiply_const_vxx_0_0_0, 0))    
+        self.connect((self.blocks_file_source_0, 0), (self.digital_psk_mod_0_0_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_0_0_0, 0), (self.osmosdr_sink_0, 0))
+        self.connect((self.digital_psk_mod_0_0_0, 0), (self.blocks_multiply_const_vxx_0_0_0, 0))
 
     def get_baud_rate(self):
         return self.baud_rate

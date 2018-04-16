@@ -45,19 +45,22 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
     if fem==0:
         FEMControl.ENABLE_FEM(switch=1)     #Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
 
-    print("Listening for received packets.\n")
-    if fem==0:
-        FEMControl.RX_FEM()
-    if debug>=1:
-        print("gr_rx turning on")
-    gr_receive()
-    if debug>=1:
-        print("grc_rx turning off")
-    # Interpret the received command
-    sd_protocol.unpack("Output",filePrefix="op_data",operatingFolder=operatingDir)
-    opMesssage = sd_protocol.opDataInterp(operatingDir)
-    print("opMessage : " + opMesssage)
-    print("operatingFolder : " + operatingDir)
+    opMesssage = None
+    while opMesssage != "picReq":
+        print("Listening for received packets.\n")
+        if fem==0:
+            FEMControl.RX_FEM()
+        if debug>=1:
+            print("gr_rx turning on")
+        gr_receive()
+        if debug>=1:
+            print("grc_rx turning off")
+        # Interpret the received command
+        sd_protocol.unpack("Output",filePrefix="op_data",operatingFolder=operatingDir)
+        opMesssage = sd_protocol.opDataInterp(operatingDir)
+        print("opMessage : " + opMesssage)
+        print("operatingFolder : " + operatingDir)
+
     if opMesssage == "picReq":
         # take a pciture
         #picLocation = Camera_control.takepicture()
@@ -80,7 +83,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             if fem==0:
                 FEMControl.TX_FEM()
             print("+=+=+=+=+=+=+=\ngr_transmit starting\n+=+=+=+=+=+=+=\n")
-            #gr_transmit(power) #commented out until we actually use sdr
+            gr_transmit(power) #commented out until we actually use sdr
             print("+=+=+=+=+=+=+=\ngr_transmit finished\n+=+=+=+=+=+=+=")
             # Wait for the ackpack
             if fem==0:
@@ -106,7 +109,7 @@ def remote(FEMlogic,power,debug = 0,fem = 1):
             FEMControl.TX_FEM()
         if debug>=0:
             print("gr_tx is sending operational data of 'Tx'_done")
-        #gr_transmit(power)
+        gr_transmit(power)
 
         print("All done!")
         ###SHUTDONW BELOW WAS ADDED BY ERICK
@@ -216,18 +219,25 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
 def gr_transmit(power):
     gr_tx = GRC_Tx(IF_Gain = power)
     gr_tx.start() # start the transmit path
+    sleep(2.5)
+    gr_tx.stop() # wait for the transmit path to finish
+    sleep(1)
+    gr_tx = None
+    sleep(5)
+    gr_tx = GRC_Tx(IF_Gain = power)
+    gr_tx.start() # start the transmit path
     gr_tx.wait() # wait for the transmit path to finish
     sleep(1)
     gr_tx = None
 
 
 def gr_receive():
-    #gr_rx = GRC_Rx()
-    #gr_rx.start() # start the transmit path
+    gr_rx = GRC_Rx()
+    gr_rx.start() # start the transmit path
     fileInterfaces.watchFile("Output",changeHold=5,interval=500)
-    #gr_rx.stop() # wait for the transmit path to finish
-    #sleep(1)
-    #gr_rx = None
+    gr_rx.stop() # wait for the transmit path to finish
+    sleep(1)
+    gr_rx = None
 
 
 def prepGRC():

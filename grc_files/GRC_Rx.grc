@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.10'?>
+<?grc format='1' created='3.7.11'?>
 <flow_graph>
   <timestamp>Sun Feb 25 11:58:42 2018</timestamp>
   <block>
@@ -560,7 +560,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(200, 324)</value>
+      <value>(200, 372)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -666,7 +666,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/odroid/Desktop/BER_TEST_OverCables/Output</value>
+      <value>/home/odroid/GitRepos/LISSA_BRANCHES/LISSA/Output</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -686,7 +686,7 @@
     </param>
     <param>
       <key>unbuffered</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>vlen</key>
@@ -4358,6 +4358,10 @@
       <value>BB_samp_rate</value>
     </param>
     <param>
+      <key>stemplot</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>tr_chan</key>
       <value>0</value>
     </param>
@@ -4524,6 +4528,12 @@
       <value>ccc</value>
     </param>
   </block>
+  <connection>
+    <source_block_id>Senior_Design_Preamble_Detection_py_bb_0</source_block_id>
+    <sink_block_id>blocks_char_to_float_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
   <connection>
     <source_block_id>Senior_Design_Preamble_Detection_py_bb_0</source_block_id>
     <sink_block_id>blocks_file_sink_0</sink_block_id>
