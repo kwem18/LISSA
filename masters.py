@@ -214,12 +214,6 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
 
 
 def gr_transmit(power):
-    gr_tx = GRC_Tx(IF_Gain = power)
-    gr_tx.start() # start the transmit path
-    sleep(2.5)
-    gr_tx.stop() # wait for the transmit path to finish
-    sleep(1)
-    gr_tx = None
     sleep(5)
     gr_tx = GRC_Tx(IF_Gain = power)
     gr_tx.start() # start the transmit path

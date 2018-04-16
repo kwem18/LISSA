@@ -204,7 +204,7 @@ class fileTrack():
         final_package = final_package+final_package + final_package
         for i in range(4):
             final_package = final_package + trash_pkt
-        for i in range(3):
+        for i in range(5):
             final_package = final_package + final_package
 
         sendToGRC(final_package) # Write the final data to the Tx_input file.
