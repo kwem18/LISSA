@@ -220,7 +220,8 @@ def gr_transmit(power):
     sleep(5)
     gr_tx = GRC_Tx(IF_Gain = power)
     gr_tx.start() # start the transmit path
-    gr_tx.wait() # wait for the transmit path to finish
+    sleep(30)
+    gr_tx.stop() # wait for the transmit path to finish
     sleep(1)
     gr_tx = None
 
@@ -280,7 +281,7 @@ if False:
 
 if __name__ == "__main__":
     logic = 0
-    power = 10
+    power = 20
     debugLevel = 5
     FEM_sw = 1
 

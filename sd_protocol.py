@@ -401,7 +401,7 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
                     legalChecksum = True
 
             ##checksum test concluded-----------------------------------------------
-
+            legalChecksum = True
             if legalName and legalLength and legalChecksum:
                 pkts[name] = data
                 x += 1 # incrememnt x so we start on the next packet.
