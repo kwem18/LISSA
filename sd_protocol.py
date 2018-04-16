@@ -201,9 +201,9 @@ class fileTrack():
          ###CREATED A TRASH PACKET TEMPLATE----------------------------------------
 
         final_package = trash_pkt + final_package    #append pkt to opdata pkt
-        final_package = final_package+final_package + final_package
-        for i in range(4):
-            final_package = final_package + trash_pkt
+        final_package = final_package+final_package + final_package+final_package+final_package + final_package
+        for i in range(3):
+            final_package = final_package + trash_pkt + packed_op_data_pkt
         for i in range(5):
             final_package = final_package + final_package
 
