@@ -713,7 +713,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/odroid/Desktop/BER_TEST_OverCables/TX_INPUT.bin</value>
+      <value>/home/odroid/GitRepos/LISSA_branches/Full-sys-Int/TX_INPUT.bin</value>
     </param>
     <param>
       <key>_coordinate</key>

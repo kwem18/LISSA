@@ -216,18 +216,25 @@ def host(FEMlogic,power,userinput = 1,debug = 0,fem = 0):
 def gr_transmit(power):
     gr_tx = GRC_Tx(IF_Gain = power)
     gr_tx.start() # start the transmit path
+    sleep(2.5)
+    gr_tx.stop() # wait for the transmit path to finish
+    sleep(1)
+    gr_tx = None
+    sleep(5)
+    gr_tx = GRC_Tx(IF_Gain = power)
+    gr_tx.start() # start the transmit path
     gr_tx.wait() # wait for the transmit path to finish
     sleep(1)
     gr_tx = None
 
 
 def gr_receive():
-    #gr_rx = GRC_Rx()
-    #gr_rx.start() # start the transmit path
+    gr_rx = GRC_Rx()
+    gr_rx.start() # start the transmit path
     fileInterfaces.watchFile("Output",changeHold=5,interval=500)
-    #gr_rx.stop() # wait for the transmit path to finish
-    #sleep(1)
-    #gr_rx = None
+    gr_rx.stop() # wait for the transmit path to finish
+    sleep(1)
+    gr_rx = None
 
 
 def prepGRC():
@@ -280,7 +287,7 @@ if __name__ == "__main__":
     debugLevel = 5
     FEM_sw = 1
 
-    testGRCs()
+    #testGRCs()
 
     remote_or_host = raw_input("Is this controlling the remote or host device? ([R]emote/[H]ost): ")
     if "R" in remote_or_host or "r" in remote_or_host:

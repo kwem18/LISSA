@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Grc Rx
-# Generated: Sat Apr 14 17:21:29 2018
+# Generated: Sun Apr 15 18:57:41 2018
 ##################################################
 
 from gnuradio import blocks
@@ -66,8 +66,8 @@ class GRC_Rx(gr.top_block):
           )
         self.digital_costas_loop_cc_0 = digital.costas_loop_cc(0.99, const_points, False)
         self.correctiq_correctiq_0 = correctiq.correctiq()
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, '/home/odroid/Desktop/BER_TEST_OverCables/Output', False)
-        self.blocks_file_sink_0.set_unbuffered(False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, '/home/odroid/GitRepos/LISSA_branches/Full-sys-Int/Output', False)
+        self.blocks_file_sink_0.set_unbuffered(True)
         self.Senior_Design_Preamble_Detection_py_bb_0 = Senior_Design.Preamble_Detection_py_bb(26530, 1)
 
         ##################################################

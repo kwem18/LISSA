@@ -666,7 +666,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/odroid/Desktop/BER_TEST_OverCables/Output</value>
+      <value>/home/odroid/GitRepos/LISSA_branches/Full-sys-Int/Output</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -686,7 +686,7 @@
     </param>
     <param>
       <key>unbuffered</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>vlen</key>

@@ -184,19 +184,28 @@ class fileTrack():
 
         pkt_checksum_header = CREATE_CHECKSUM(payload,pyld_len,op_pktname)
 
-        final_package = op_pktname + pkt_length_header + pkt_checksum_header + payload    #Add pktname to pyld
-        # 2ndary header is attached to data-------------------------------------------
+        packed_op_data_pkt =  op_pktname + pkt_length_header + pkt_checksum_header + payload #T
+        # 2ndary header is attached to data packed_op_dat_pkt is the op_data pkt template-------------------------
+
+        final_package = packed_op_data_pkt    #Add op_data pkt to pyld
+
         print("secondary header made")
         final_package = self.packetize(data=final_package)  #add primary header to relevant data
-        print("Primrary header made")
+        print("Primary header made")
 
+        ###MAKING TRASH PACKET----------------------------------------
         trash_pkt = "pkt9999"
         for h in range(10):
             trash_pkt += " I BLESS THE RAINS DOWN IN AFRICA"
         trash_pkt = self.packetize(trash_pkt)           #add 1st layer header to trash packet
+         ###CREATED A TRASH PACKET TEMPLATE----------------------------------------
 
-        final_package = trash_pkt + trash_pkt + trash_pkt + trash_pkt + trash_pkt + final_package
-        final_package += trash_pkt + trash_pkt + trash_pkt
+        final_package = trash_pkt + final_package    #append pkt to opdata pkt
+        final_package = final_package+final_package + final_package
+        for i in range(4):
+            final_package = final_package + trash_pkt
+        for i in range(3):
+            final_package = final_package + final_package
 
         sendToGRC(final_package) # Write the final data to the Tx_input file.
 
