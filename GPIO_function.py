@@ -40,13 +40,14 @@ class GPIO_function:
 
         self.initial = int(0)           #to be used for time displacement of cmd
         self.final = int(0)             #to be used for time displacement of cmd
-        self.clock = threading.Thread(target=self.run_clock)      #Thread exclusively for CLOCK (C2)
         self.paused = False
         self.pause_cond = threading.Condition(threading.Lock())
         self.clk_freq = float(25)       #Frequency of clock signal definition executeThread
         self.sync = int(sync)           #sync determines whether or not we want sequential ginsl in ADAFRUIT PIN C2
+        if self.sync==1:
+            self.clock = threading.Thread(target=self.run_clock)  # Thread exclusively for CLOCK (C2)
+            self.clock.setDaemon(False)  # redundant line to make sure that thread ends when main function ends
         self.off = int(1)
-        self.clock.setDaemon(False)     #redundant line to make sure that thread ends when main function ends
 
     def ENABLE_FEM(self,switch=0):
         initial = time.clock()                  #Start clocking in time displacement
@@ -86,9 +87,9 @@ class GPIO_function:
         self.ft232h.output(8,GPIO.HIGH)          #DRIVE CONTROL_0 SIGNAL TO HIGH VOLTAGE
         time.sleep(0.2)
         if self.sw_control==1:
-            self.ft232h.output(11,GPIO.HIGH)    #Drive control_1(C3) high
+            self.ft232h.output(12, GPIO.LOW)  # Drive control_2(C4) low
             time.sleep(0.35)
-            self.ft232h.output(12,GPIO.LOW)   #Drive control_2(C4) low
+            self.ft232h.output(11, GPIO.HIGH)  # Drive control_1(C3) high
             time.sleep(0.35)
         return
 
