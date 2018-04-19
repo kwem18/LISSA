@@ -292,9 +292,9 @@ if False:
 
 if __name__ == "__main__":
     logic = 0
-    power = 35
+    power = 20
     debugLevel = 5
-    FEM_sw = 1
+    FEM_sw = 0
 
     # testGRCs()
 
