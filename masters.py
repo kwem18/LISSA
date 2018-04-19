@@ -108,13 +108,14 @@ def remote(FEMlogic, power, debug=0, fem=1):
     print("Picture successfully transmitted.")
     fileManager.opDataPack("Arcv")
 
-    while opMessage != "All Received":
+    while opMesssage != "All Received":
         # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
         if fem == 0:
             FEMControl.TX_FEM()
         if debug >= 0:
             print("gr_tx is sending operational data of 'Tx'_done")
         gr_transmit(power, 10)  # Send the all done message for 10 seconds
+
 
         
 
@@ -291,10 +292,10 @@ if False:
             raise ValueError("Input must be specified as [H]ost or [R]emote.")
 
 if __name__ == "__main__":
-    logic = 0
-    power = 35
+    logic = 1
+    power = 20
     debugLevel = 5
-    FEM_sw = 1
+    FEM_sw = 0
 
     # testGRCs()
 
