@@ -170,7 +170,7 @@ class fileTrack():
             raise TypeError('"message" parameter must be a string.')
 
         op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
-        payload = message + message + message
+        payload = message + message + message + message
 
         ###Start creating 2ndary header-------------------------------
         # Length Header
@@ -221,7 +221,7 @@ class fileTrack():
         ## check lneght of pkt ###
         datalen = len(data)
         if datalen > 9997:
-            raise ValueError("Size of dat too large for protocol. MUST BE LESS THAN 10,000 BYTES.")
+            raise ValueError("Size of data too large for protocol. MUST BE LESS THAN 10,000 BYTES.")
 
         ### Create Header ###
         # Length field
@@ -309,11 +309,11 @@ def opDataInterp(opMessageLocation,delete=0):
 
     if len(opData) == 0:
         opMessage = "Op Pack Empty"
-    elif "Send Picture" in opData:
+    elif "picReq" in opData:
         opMessage = "picReq"
-    elif "powerOff" in opData:
+    elif "pwrOff" in opData:
         opMessage = "reboot"
-    elif "All Received" in opData:
+    elif "Arcv" in opData:
         opMessage = "All Received"
     elif "Nothing Received" in opData:
         opMessage = "Nothing Received"
