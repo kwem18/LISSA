@@ -106,7 +106,7 @@ def remote(FEMlogic, power, debug=0, fem=1):
         filesRemaining = fileManager.ackInterp(operatingDir)
 
     print("Picture successfully transmitted.")
-    fileManager.opDataPack("All Received")
+    fileManager.opDataPack("Arcv")
 
     # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
     if fem == 0:
@@ -153,7 +153,7 @@ def host(FEMlogic, power, userinput=1, debug=0, fem=0):
     if debug >= 2:
         print("Getting ready to send picture request.")
     # Package picture request for transmission
-    fileManager.opDataPack("Send Picture")
+    fileManager.opDataPack("picReq")
 
     if fem == 0:
         FEMControl.ENABLE_FEM(switch=1)
@@ -197,7 +197,7 @@ def host(FEMlogic, power, userinput=1, debug=0, fem=0):
                 if receivedFiles == "All Received":
                     break
             else:
-                fileManager.opDataPack("Nothing Received")
+                fileManager.opDataPack("Nrcv")
         else:
             # Reply with ack pack of received files
             fileManager.opDataPack(str(receivedFiles))
