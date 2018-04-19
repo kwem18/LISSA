@@ -28,7 +28,10 @@ def watchFile(fileName,change="size",interval=50,changeHold = -1,stopAfter = 60*
         raise IOError("fileName fails to point to a file that exists.")
 
     if (type(stopAfter) != int) or type(stopAfter) != float:
-        raise TypeError("stopAfter should be specified as a int or float in seconds.")
+        try:
+            stopAfter = float(stopAfter)
+        except:
+            raise TypeError("stopAfter should be specified as a int or float in seconds.")
 
     # Change unit of interval from milliseconds to seconds for sleep
     interval = interval/1000.

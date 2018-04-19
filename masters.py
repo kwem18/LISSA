@@ -51,7 +51,7 @@ def remote(FEMlogic, power, debug=0, fem=1):
         FEMControl.ENABLE_FEM(switch=1)  # Turn on FEM path, with only ENABLE driven high, FEM is in RX Mode
 
     opMesssage = None
-    while opMesssage != "picReq":
+    while opMesssage != "picReq" and opMesssage != "Nothing Received":
         print("Listening for received packets.\n")
         if fem == 0:
             FEMControl.RX_FEM()
@@ -289,7 +289,7 @@ if False:
 
 if __name__ == "__main__":
     logic = 0
-    power = 20
+    power = 35
     debugLevel = 5
     FEM_sw = 1
 
