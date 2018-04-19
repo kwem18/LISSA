@@ -108,16 +108,22 @@ def remote(FEMlogic, power, debug=0, fem=1):
     print("Picture successfully transmitted.")
     fileManager.opDataPack("Arcv")
 
+    opMesssage = None
     while opMesssage != "All Received":
         # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
         if fem == 0:
             FEMControl.TX_FEM()
         if debug >= 0:
             print("gr_tx is sending operational data of 'Tx'_done")
-        gr_transmit(power, 10)  # Send the all done message for 10 seconds
-
-
-        
+        gr_transmit(power, 15)  # Send the all done message for 10 seconds
+        if fem == 0:
+            FEMControl.RX_FEM()
+        if debug >= 0:
+            print("gr_rx is listening to operational data.")
+        gr_receive(40)
+        sd_protocol.unpack("Output","op_data",operatingDir)
+        opMesssage = fileManager.ackInterp(operatingDir)
+        print ("Op message received: "+str(opMesssage))
 
     print("All done!")
     ### SHUTDONW BELOW WAS ADDED BY ERICK
@@ -213,6 +219,17 @@ def host(FEMlogic, power, userinput=1, debug=0, fem=0):
 
     if debug >= 0:
         print("All Packets Received!")
+
+    fileManager.opDataPack("Arcv")
+    if fem == 0:
+        FEMControl.TX_FEM()
+    if debug >= 0:
+        print("Transmitting reply to all done.")
+    gr_transmit(power,15)
+    if fem == 0:
+        FEMControl.RX_FEM()
+    if debug >= 0:
+        print("All done, shutting down.")
     if fem == 0:
         FEMControl.ENABLE_FEM(switch=0)
         FEMControl.shutdown()
@@ -292,7 +309,7 @@ if False:
             raise ValueError("Input must be specified as [H]ost or [R]emote.")
 
 if __name__ == "__main__":
-    logic = 1
+    logic = 0
     power = 20
     debugLevel = 5
     FEM_sw = 0
