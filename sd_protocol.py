@@ -170,7 +170,7 @@ class fileTrack():
             raise TypeError('"message" parameter must be a string.')
 
         op_pktname = 'op_data'          #Standardized name for all operational data pkts used in software
-        payload = message + message + message + message
+        payload = message
 
         ###Start creating 2ndary header-------------------------------
         # Length Header
