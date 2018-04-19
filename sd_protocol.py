@@ -309,11 +309,11 @@ def opDataInterp(opMessageLocation,delete=0):
 
     if len(opData) == 0:
         opMessage = "Op Pack Empty"
-    elif "Send Picture" in opData:
+    elif "picReq" in opData:
         opMessage = "picReq"
-    elif "powerOff" in opData:
+    elif "pwrOff" in opData:
         opMessage = "reboot"
-    elif "All Received" in opData:
+    elif "Arcv" in opData:
         opMessage = "All Received"
     elif "Nothing Received" in opData:
         opMessage = "Nothing Received"
