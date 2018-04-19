@@ -108,12 +108,15 @@ def remote(FEMlogic, power, debug=0, fem=1):
     print("Picture successfully transmitted.")
     fileManager.opDataPack("Arcv")
 
-    # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
-    if fem == 0:
-        FEMControl.TX_FEM()
-    if debug >= 0:
-        print("gr_tx is sending operational data of 'Tx'_done")
-    gr_transmit(power, 10)  # Send the all done message for 10 seconds
+    while opMessage != "All Received":
+        # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
+        if fem == 0:
+            FEMControl.TX_FEM()
+        if debug >= 0:
+            print("gr_tx is sending operational data of 'Tx'_done")
+        gr_transmit(power, 10)  # Send the all done message for 10 seconds
+
+        
 
     print("All done!")
     ### SHUTDONW BELOW WAS ADDED BY ERICK
@@ -289,7 +292,7 @@ if False:
 
 if __name__ == "__main__":
     logic = 0
-    power = 20
+    power = 35
     debugLevel = 5
     FEM_sw = 1
 
