@@ -397,10 +397,12 @@ def unpack(GRCOutput, filePrefix, operatingFolder):
             if legalName and legalLength:
                 createdCheck = CREATE_CHECKSUM(data,length,name)#call checksum function
                 if createdCheck == receivedCheck:
+                    print("Checksum passed for packet: "+name)
                     legalChecksum = True
+                else:
+                    print("Checksum FAILED for packet: "+name)
 
             ##checksum test concluded-----------------------------------------------
-            legalChecksum = True
             if legalName and legalLength and legalChecksum:
                 pkts[name] = data
                 x += 1 # incrememnt x so we start on the next packet.
