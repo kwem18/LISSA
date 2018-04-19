@@ -106,14 +106,17 @@ def remote(FEMlogic, power, debug=0, fem=1):
         filesRemaining = fileManager.ackInterp(operatingDir)
 
     print("Picture successfully transmitted.")
-    fileManager.opDataPack("All Received")
+    fileManager.opDataPack("Arcv")
 
-    # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
-    if fem == 0:
-        FEMControl.TX_FEM()
-    if debug >= 0:
-        print("gr_tx is sending operational data of 'Tx'_done")
-    gr_transmit(power, 10)  # Send the all done message for 10 seconds
+    while opMessage != "All Received":
+        # fileManager.opDataPack("Tx Done") #DELETE IF NOT USED FOR FULL-sys TEST
+        if fem == 0:
+            FEMControl.TX_FEM()
+        if debug >= 0:
+            print("gr_tx is sending operational data of 'Tx'_done")
+        gr_transmit(power, 10)  # Send the all done message for 10 seconds
+
+        
 
     print("All done!")
     ### SHUTDONW BELOW WAS ADDED BY ERICK
@@ -153,7 +156,7 @@ def host(FEMlogic, power, userinput=1, debug=0, fem=0):
     if debug >= 2:
         print("Getting ready to send picture request.")
     # Package picture request for transmission
-    fileManager.opDataPack("Send Picture")
+    fileManager.opDataPack("picReq")
 
     if fem == 0:
         FEMControl.ENABLE_FEM(switch=1)
@@ -197,7 +200,7 @@ def host(FEMlogic, power, userinput=1, debug=0, fem=0):
                 if receivedFiles == "All Received":
                     break
             else:
-                fileManager.opDataPack("Nothing Received")
+                fileManager.opDataPack("Nrcv")
         else:
             # Reply with ack pack of received files
             fileManager.opDataPack(str(receivedFiles))
