@@ -122,7 +122,7 @@ def remote(FEMlogic, power, debug=0, fem=1):
             print("gr_rx is listening to operational data.")
         gr_receive(40)
         sd_protocol.unpack("Output","op_data",operatingDir)
-        opMesssage = fileManager.ackInterp(operatingDir)
+        opMesssage = sd_protocol.opDataInterp(operatingDir)
         print ("Op message received: "+str(opMesssage))
 
     print("All done!")
@@ -309,8 +309,8 @@ if False:
             raise ValueError("Input must be specified as [H]ost or [R]emote.")
 
 if __name__ == "__main__":
-    logic = 0
-    power = 20
+    logic = 1
+    power = 30
     debugLevel = 5
     FEM_sw = 0
 
